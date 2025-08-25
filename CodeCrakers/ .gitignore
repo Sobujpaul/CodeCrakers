@@ -1,4 +1,9 @@
-# Ignore Visual Studio temporary files
+# Visual Studio junk
 .vs/
 bin/
 obj/
+*.user
+*.suo
+*.cache
+*.db
+*.log
