@@ -2,7 +2,8 @@
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using CodeCrakers.Views; // Ensure LoginPage is inside this namespace
-
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
 namespace CodeCrakers
 {
     public partial class MainWindow : Window
@@ -10,63 +11,49 @@ namespace CodeCrakers
         public MainWindow()
         {
             InitializeComponent();
+            this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
         }
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
 
         // --- Navigation ---
         private void SignIn_Click(object sender, RoutedEventArgs e)
         {
             Views.LoginPage login = new Views.LoginPage();
             login.ShowDialog(); // opens it as a separate window
-       
+
+        }
+        private void pnlControlBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            WindowInteropHelper helper= new WindowInteropHelper(this);
+            SendMessage(helper.Handle, 161,2,0);
         }
 
-        // --- Window Controls ---
-        private void Minimize_Click(object sender, RoutedEventArgs e)
+        private void pnlControlBar_MouseEnter(object sender, MouseEventArgs e)
         {
-            this.WindowState = WindowState.Minimized;
+            this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
         }
 
-        private void Maximize_Click(object sender, RoutedEventArgs e)
+        private void btnClose_Click(object sender, RoutedEventArgs e)
         {
-            if (this.WindowState == WindowState.Maximized)
+          Application.Current.Shutdown();
+        }
+
+        private void btnMinimize_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;   
+        }
+
+        private void btnMaximize_Click(object sender, RoutedEventArgs e)
+        {
+            if(this.WindowState == WindowState.Normal)
             {
-                this.WindowState = WindowState.Normal;
-                ChangeMaxRestoreIcon("Images/Maximize1.png");
+                this.WindowState = WindowState.Maximized;
             }
             else
             {
-                this.WindowState = WindowState.Maximized;
-                ChangeMaxRestoreIcon("Images/Restore.png");
-            }
-        }
-
-        private void Close_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        // --- Drag Window & Double-Click Title Bar ---
-        private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                if (e.ClickCount == 2)
-                {
-                    Maximize_Click(sender, e);
-                }
-                else
-                {
-                    this.DragMove();
-                }
-            }
-        }
-
-        // --- Helper: Update Max/Restore button icon ---
-        private void ChangeMaxRestoreIcon(string imagePath)
-        {
-            if (MaxRestoreImage != null)
-            {
-                MaxRestoreImage.Source = new BitmapImage(new System.Uri(imagePath, System.UriKind.Relative));
+                this.WindowState = WindowState.Normal;
             }
         }
     }
