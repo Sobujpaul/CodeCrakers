@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CodeCrakers")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+989f1510d7dd8ec228d068d852aaa0da2fa8ec36")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+847cd0bc0504c813904adc37e34fa5d7df25c156")]
 [assembly: System.Reflection.AssemblyProductAttribute("CodeCrakers")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CodeCrakers")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
