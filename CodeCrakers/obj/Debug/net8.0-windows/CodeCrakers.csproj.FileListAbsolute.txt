@@ -27,3 +27,5 @@ D:\3.1\Software Engineering and Information System\CodeCrakers\CodeCrakers\obj\D
 D:\3.1\Software Engineering and Information System\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\CodeCrakers.pdb
 D:\3.1\Software Engineering and Information System\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\CodeCrakers.genruntimeconfig.cache
 D:\3.1\Software Engineering and Information System\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\ref\CodeCrakers.dll
+D:\3.1\Software Engineering and Information System\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\SignUpPage.baml
+D:\3.1\Software Engineering and Information System\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\SignUpPage.g.cs
