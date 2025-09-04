@@ -1,17 +1,24 @@
 ﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
-using CodeCrakers.Views; // Ensure LoginPage is inside this namespace
-using System.Runtime.InteropServices;
 using System.Windows.Interop;
+using CodeCrakers.Views;
+using CodeCrakers.Data; // For UserProfileRepository
+using System.Runtime.InteropServices;
+
 namespace CodeCrakers
 {
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private int _userId; // logged-in user ID
+        private UserProfileRepository _profileRepo;
+
+        public MainWindow(int userId) // receive userId from LoginPage
         {
             InitializeComponent();
             this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
+
+            _userId = userId;
+            _profileRepo = new UserProfileRepository();
         }
 
         [DllImport("user32.dll")]
@@ -20,14 +27,14 @@ namespace CodeCrakers
         // --- Navigation ---
         private void SignIn_Click(object sender, RoutedEventArgs e)
         {
-            Views.LoginPage login = new Views.LoginPage();
-            login.ShowDialog(); // opens it as a separate window
-
+            LoginPage login = new LoginPage();
+            login.ShowDialog();
         }
+
         private void pnlControlBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            WindowInteropHelper helper= new WindowInteropHelper(this);
-            SendMessage(helper.Handle, 161,2,0);
+            WindowInteropHelper helper = new WindowInteropHelper(this);
+            SendMessage(helper.Handle, 161, 2, 0);
         }
 
         private void pnlControlBar_MouseEnter(object sender, MouseEventArgs e)
@@ -37,24 +44,21 @@ namespace CodeCrakers
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
-          Application.Current.Shutdown();
+            Application.Current.Shutdown();
         }
 
         private void btnMinimize_Click(object sender, RoutedEventArgs e)
         {
-            this.WindowState = WindowState.Minimized;   
+            this.WindowState = WindowState.Minimized;
         }
 
         private void btnMaximize_Click(object sender, RoutedEventArgs e)
         {
-            if(this.WindowState == WindowState.Normal)
-            {
+            if (this.WindowState == WindowState.Normal)
                 this.WindowState = WindowState.Maximized;
-            }
             else
-            {
                 this.WindowState = WindowState.Normal;
-            }
         }
+
     }
 }

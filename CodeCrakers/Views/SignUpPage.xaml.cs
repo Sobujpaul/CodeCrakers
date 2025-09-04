@@ -1,8 +1,4 @@
-﻿using Microsoft.Data.Sqlite;
-using System;
-using Microsoft.Data.Sqlite;
-using System.Security.Cryptography;
-using System.Text;
+﻿using CodeCrakers.Data;
 using System.Windows;
 using System.Windows.Input;
 
@@ -10,47 +6,9 @@ namespace CodeCrakers.Views
 {
     public partial class SignUpPage : Window
     {
-        private string dbPath = "Data Source=users.db"; // SQLite database file
-
         public SignUpPage()
         {
             InitializeComponent();
-            InitializeDatabase(); // Create DB if not exists
-        }
-
-        // Create SQLite database and Users table if not exists
-        private void InitializeDatabase()
-        {
-            using (SQLiteConnection con = new SQLiteConnection(dbPath))
-            {
-                con.Open();
-                string query = @"CREATE TABLE IF NOT EXISTS Users(
-                                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    Username TEXT UNIQUE,
-                                    Email TEXT UNIQUE,
-                                    Password TEXT
-                                );";
-                SQLiteCommand cmd = new SQLiteCommand(query, con);
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        // Hash password using SHA256
-        private string HashPassword(string password)
-        {
-            using (SHA256 sha = SHA256.Create())
-            {
-                byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
-                StringBuilder sb = new StringBuilder();
-                foreach (byte b in bytes)
-                    sb.Append(b.ToString("x2"));
-                return sb.ToString();
-            }
-        }
-
-        private void btnClose_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -59,6 +17,55 @@ namespace CodeCrakers.Views
                 this.DragMove();
         }
 
+        private void btnClose_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void btnSignUp_Click(object sender, RoutedEventArgs e)
+        {
+            string username = txtUsername.Text.Trim();
+            string email = txtEmail.Text.Trim();
+            string password = txtPassword.Password.Trim();
+
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                MessageBox.Show("⚠️ All fields are required!", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtUsername.Text = string.Empty;
+                txtEmail.Text = string.Empty;
+                txtPassword.Password = string.Empty;
+                txtPasswordVisible.Text = string.Empty;
+
+                // Set focus back to username
+                txtUsername.Focus();
+                return;
+            }
+
+            var userRepo = new UserRepository();
+
+            if (userRepo.UsernameOrEmailExists(username, email))
+            {
+                MessageBox.Show("⚠️ Username or Email already exists.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtUsername.Text = string.Empty;
+                txtEmail.Text = string.Empty;
+                txtPassword.Password = string.Empty;
+                txtPasswordVisible.Text = string.Empty;
+
+                // Set focus back to username
+                txtUsername.Focus();
+                return;
+            }
+
+            int newUserId = userRepo.CreateUser(username, email, password);
+            MessageBox.Show("✅ Account created successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            // Navigate to LoginPage
+            LoginPage login = new LoginPage();
+            login.Show();
+            this.Close();
+        }
+
+        // Toggle password visibility
         private void btnTogglePassword_Click(object sender, RoutedEventArgs e)
         {
             if (txtPassword.Visibility == Visibility.Visible)
@@ -77,65 +84,11 @@ namespace CodeCrakers.Views
             }
         }
 
-        // Sign Up button click
-        private void btnSignUp_Click(object sender, RoutedEventArgs e)
-        {
-            string username = txtUsername.Text.Trim();
-            string email = txtEmail.Text.Trim();
-            string password = txtPassword.Password;
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-            {
-                MessageBox.Show("All fields are required!", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            string hashedPassword = HashPassword(password);
-
-            try
-            {
-                using (SQLiteConnection con = new SQLiteConnection(dbPath))
-                {
-                    con.Open();
-                    string query = "INSERT INTO Users (Username, Email, Password) VALUES (@username, @email, @password)";
-                    SQLiteCommand cmd = new SQLiteCommand(query, con);
-                    cmd.Parameters.AddWithValue("@username", username);
-                    cmd.Parameters.AddWithValue("@email", email);
-                    cmd.Parameters.AddWithValue("@password", hashedPassword);
-
-                    cmd.ExecuteNonQuery();
-                }
-
-                MessageBox.Show("Sign Up successful! You can now log in.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                // Navigate to Login Page
-                LoginPage login = new LoginPage();
-                login.Show();
-                this.Close();
-            }
-            catch (SQLiteException ex)
-            {
-                if (ex.ResultCode == SQLiteErrorCode.Constraint)
-                {
-                    MessageBox.Show("Username or Email already exists!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                else
-                {
-                    MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-        }
-
-        // Click "Login" TextBlock to go back to LoginPage
         private void LoginTextBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            // Open LoginPage
             LoginPage login = new LoginPage();
             login.Show();
-
-            // Close SignUpPage so only LoginPage is visible
             this.Close();
         }
-
     }
 }

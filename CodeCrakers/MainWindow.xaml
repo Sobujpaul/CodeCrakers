@@ -154,30 +154,7 @@
                     </StackPanel>
 
                     <!--header and caption -->
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-
-                        <!--Caption -->
-                        <StackPanel Grid.Column="0"
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Center">
-                            <fa:IconImage Icon="Home" 
-                                           Foreground="{StaticResource titleColor2}"
-                                           Height="20"
-                                           Width="20"
-                                           Margin="35,0,10,0"/>
-                            <TextBlock Text="Dashboard"
-                                       Foreground="{StaticResource titleColor2}"
-                                       FontSize="16"
-                                       FontFamily="Montserrat"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-
-                    </Grid>
+                    
                     
 
                 </Grid>

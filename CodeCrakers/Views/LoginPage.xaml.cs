@@ -1,7 +1,8 @@
-﻿using CodeCrakers.Views; // If navigating to another page // ✅ WPF version
+﻿using CodeCrakers.Data;
+using CodeCrakers.Views; // ✅ WPF navigation
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
+
 namespace CodeCrakers.Views
 {
     public partial class LoginPage : Window
@@ -11,66 +12,76 @@ namespace CodeCrakers.Views
             InitializeComponent();
         }
 
-
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
-
+            if (e.LeftButton == MouseButtonState.Pressed)
+                this.DragMove();
         }
+
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
+        // Login button click
         private void btnlogin_Click(object sender, RoutedEventArgs e)
         {
-            // Example: simple validation
-            if (TextUser.Text == "admin" && txtPass.Password == "1234")
-            {
-                // Create and show MainWindow
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.Show();
+            string usernameOrEmail = TextUser.Text.Trim();
+            string password = txtPass.Password.Trim();
 
-                // Close the login window
+            if (string.IsNullOrWhiteSpace(usernameOrEmail) || string.IsNullOrWhiteSpace(password))
+            {
+                MessageBox.Show("⚠️ Please enter both username and password.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                TextUser.Text = string.Empty;
+                txtPass.Password = string.Empty;
+               TextUser.Focus();
+                return;
+            }
+
+            var userRepo = new UserRepository();
+            var userId = userRepo.ValidateLogin(usernameOrEmail, password);
+
+            if (userId.HasValue)
+            {
+                MessageBox.Show("✅ Login successful!", "Welcome", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                MainWindow mainWindow = new MainWindow(userId.Value);
+                mainWindow.Show();
                 this.Close();
             }
             else
             {
-                MessageBox.Show("Invalid username or password!", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("❌ Invalid username or password!", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                TextUser.Text = string.Empty;
+                txtPass.Password = string.Empty;
             }
         }
 
-
-
+        // Toggle password visibility
         private void btnTogglePassword_Click(object sender, RoutedEventArgs e)
         {
             if (txtPass.Visibility == Visibility.Visible)
             {
-                // Show password as text
                 txtPassVisible.Text = txtPass.Password;
                 txtPass.Visibility = Visibility.Collapsed;
                 txtPassVisible.Visibility = Visibility.Visible;
                 iconEye.Icon = FontAwesome.Sharp.IconChar.EyeSlash;
-                // Use string, NOT IconChar
             }
             else
             {
-                // Hide password
                 txtPass.Password = txtPassVisible.Text;
                 txtPass.Visibility = Visibility.Visible;
                 txtPassVisible.Visibility = Visibility.Collapsed;
-                iconEye.Icon = FontAwesome.Sharp.IconChar.Eye; // To show the "eye" icon
+                iconEye.Icon = FontAwesome.Sharp.IconChar.Eye;
             }
         }
+
+        // Navigate to SignUpPage
         private void SignUpTextBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            // Open SignUpPage
             SignUpPage signUp = new SignUpPage();
             signUp.Show();
-
-            // Close LoginPage
             this.Close();
         }
-
-
     }
 }
