@@ -4,6 +4,7 @@ using System.Windows.Interop;
 using CodeCrakers.Views;
 using CodeCrakers.Data; // For UserProfileRepository
 using System.Runtime.InteropServices;
+using System.Windows.Controls;
 
 namespace CodeCrakers
 {
@@ -11,14 +12,52 @@ namespace CodeCrakers
     {
         private int _userId; // logged-in user ID
         private UserProfileRepository _profileRepo;
+        private DashboardPage _dashboardPage;
+        private PlatformPage _platformPage;
 
         public MainWindow(int userId) // receive userId from LoginPage
         {
-            InitializeComponent();
-            this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("MainWindow: Starting initialization...");
+                InitializeComponent();
+                System.Diagnostics.Debug.WriteLine("MainWindow: InitializeComponent completed");
+                
+                this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
 
-            _userId = userId;
-            _profileRepo = new UserProfileRepository();
+                _userId = userId;
+                _profileRepo = new UserProfileRepository();
+                System.Diagnostics.Debug.WriteLine("MainWindow: User profile repository initialized");
+                
+                // Initialize pages
+                System.Diagnostics.Debug.WriteLine("MainWindow: Creating DashboardPage...");
+                _dashboardPage = new DashboardPage(_userId);
+                System.Diagnostics.Debug.WriteLine("MainWindow: DashboardPage created");
+                
+                System.Diagnostics.Debug.WriteLine("MainWindow: Creating PlatformPage...");
+                _platformPage = new PlatformPage(_userId);
+                System.Diagnostics.Debug.WriteLine("MainWindow: PlatformPage created");
+                
+                // Set up event handlers
+                _platformPage.OnSettingsSaved = RefreshDashboard;
+                System.Diagnostics.Debug.WriteLine("MainWindow: Event handlers set up");
+                
+                // Show dashboard by default
+                System.Diagnostics.Debug.WriteLine("MainWindow: Navigating to dashboard...");
+                NavigateToDashboard();
+                System.Diagnostics.Debug.WriteLine("MainWindow: Navigation completed");
+                
+                System.Diagnostics.Debug.WriteLine("MainWindow: Initialization completed successfully");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"MainWindow: Error during initialization: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"MainWindow: Stack Trace: {ex.StackTrace}");
+                
+                MessageBox.Show($"Error initializing main window: {ex.Message}\n\nStack Trace:\n{ex.StackTrace}", 
+                    "Initialization Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.Close();
+            }
         }
 
         [DllImport("user32.dll")]
@@ -58,6 +97,53 @@ namespace CodeCrakers
                 this.WindowState = WindowState.Maximized;
             else
                 this.WindowState = WindowState.Normal;
+        }
+
+        // Navigation Methods
+        private void NavigateToDashboard()
+        {
+            contentArea.Content = _dashboardPage;
+            txtPageTitle.Text = "Dashboard";
+        }
+
+        private void NavigateToPlatform()
+        {
+            contentArea.Content = _platformPage;
+            txtPageTitle.Text = "Platform Settings";
+        }
+
+        private void RefreshDashboard()
+        {
+            // Always refresh the dashboard data, regardless of current view
+            _dashboardPage.RefreshData();
+            
+            // If dashboard is currently visible, it will show the updated data immediately
+            // If not, the data will be fresh when user navigates back to dashboard
+        }
+
+        // Menu button click handlers (will be connected to XAML)
+        public void OnDashboardClick(object sender, RoutedEventArgs e)
+        {
+            NavigateToDashboard();
+        }
+
+        public void OnPlatformClick(object sender, RoutedEventArgs e)
+        {
+            NavigateToPlatform();
+        }
+
+        public void OnNotificationClick(object sender, RoutedEventArgs e)
+        {
+            // TODO: Implement notifications page
+            MessageBox.Show("Notifications feature coming soon!", "Feature Preview", 
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        public void OnSuggestionClick(object sender, RoutedEventArgs e)
+        {
+            // TODO: Implement suggestions page
+            MessageBox.Show("Suggestions feature coming soon!", "Feature Preview", 
+                MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
     }

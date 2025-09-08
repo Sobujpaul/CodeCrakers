@@ -26,34 +26,49 @@ namespace CodeCrakers.Views
         // Login button click
         private void btnlogin_Click(object sender, RoutedEventArgs e)
         {
-            string usernameOrEmail = TextUser.Text.Trim();
-            string password = txtPass.Password.Trim();
-
-            if (string.IsNullOrWhiteSpace(usernameOrEmail) || string.IsNullOrWhiteSpace(password))
+            try
             {
-                MessageBox.Show("⚠️ Please enter both username and password.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                TextUser.Text = string.Empty;
-                txtPass.Password = string.Empty;
-               TextUser.Focus();
-                return;
+                string usernameOrEmail = TextUser.Text.Trim();
+                string password = txtPass.Password.Trim();
+
+                if (string.IsNullOrWhiteSpace(usernameOrEmail) || string.IsNullOrWhiteSpace(password))
+                {
+                    MessageBox.Show("⚠️ Please enter both username and password.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    TextUser.Text = string.Empty;
+                    txtPass.Password = string.Empty;
+                    TextUser.Focus();
+                    return;
+                }
+
+                var userRepo = new UserRepository();
+                var userId = userRepo.ValidateLogin(usernameOrEmail, password);
+
+                if (userId.HasValue)
+                {
+                    MessageBox.Show("✅ Login successful!", "Welcome", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    // Create and show main window
+                    MainWindow mainWindow = new MainWindow(userId.Value);
+                    mainWindow.Show();
+                    
+                    // Close login window
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("❌ Invalid username or password!", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    TextUser.Text = string.Empty;
+                    txtPass.Password = string.Empty;
+                    TextUser.Focus();
+                }
             }
-
-            var userRepo = new UserRepository();
-            var userId = userRepo.ValidateLogin(usernameOrEmail, password);
-
-            if (userId.HasValue)
+            catch (Exception ex)
             {
-                MessageBox.Show("✅ Login successful!", "Welcome", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                MainWindow mainWindow = new MainWindow(userId.Value);
-                mainWindow.Show();
-                this.Close();
-            }
-            else
-            {
-                MessageBox.Show("❌ Invalid username or password!", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
-                TextUser.Text = string.Empty;
-                txtPass.Password = string.Empty;
+                MessageBox.Show($"❌ Login error: {ex.Message}\n\nPlease try again or contact support.", 
+                    "Login Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                
+                System.Diagnostics.Debug.WriteLine($"Login error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
             }
         }
 

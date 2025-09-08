@@ -49,7 +49,8 @@
 
                     </StackPanel>
                     <RadioButton  Style="{StaticResource menuButton}"
-                                  Tag="{StaticResource color1}">
+                                  Tag="{StaticResource color1}"
+                                  Click="OnDashboardClick">
                         <StackPanel Orientation="Horizontal">
                               <fa:IconImage Icon="Home" Style="{StaticResource menuButtonIcon}"/>
                               <TextBlock Text="Dashboard" Style="{StaticResource menuButtonText}"/>
@@ -59,7 +60,8 @@
                     </RadioButton>
 
                     <RadioButton  Style="{StaticResource menuButton}"
-                                  Tag="{StaticResource color2}">
+                                  Tag="{StaticResource color2}"
+                                  Click="OnNotificationClick">
                         <StackPanel Orientation="Horizontal">
                             <fa:IconImage Icon="Bell" Style="{StaticResource menuButtonIcon}"/>
                             <TextBlock Text="Notification" Style="{StaticResource menuButtonText}"/>
@@ -70,7 +72,8 @@
 
 
                     <RadioButton  Style="{StaticResource menuButton}"
-                                  Tag="{StaticResource color3}">
+                                  Tag="{StaticResource color3}"
+                                  Click="OnSuggestionClick">
                         <StackPanel Orientation="Horizontal">
                             <fa:IconImage Icon="Lightbulb" Style="{StaticResource menuButtonIcon}"/>
                             <TextBlock Text="Suggestion" Style="{StaticResource menuButtonText}"/>
@@ -80,7 +83,8 @@
                     </RadioButton>
 
                     <RadioButton  Style="{StaticResource menuButton}"
-                                  Tag="{StaticResource color4}">
+                                  Tag="{StaticResource color4}"
+                                  Click="OnPlatformClick">
                         <StackPanel Orientation="Horizontal">
                             <fa:IconImage Icon="Globe" Style="{StaticResource menuButtonIcon}"/>
                             <TextBlock Text="Platform" Style="{StaticResource menuButtonText}"/>
@@ -154,8 +158,22 @@
                     </StackPanel>
 
                     <!--header and caption -->
-                    
-                    
+                    <StackPanel Grid.Row="1" 
+                                Orientation="Horizontal" 
+                                VerticalAlignment="Center" 
+                                Margin="20,0">
+                        <TextBlock x:Name="txtPageTitle" 
+                                   Text="Dashboard" 
+                                   Foreground="{StaticResource titleColor1}"
+                                   FontFamily="Montserrat"
+                                   FontSize="20"
+                                   FontWeight="Medium"/>
+                    </StackPanel>
+
+                    <!--content section /child views-->
+                    <ContentControl x:Name="contentArea" 
+                                    Grid.Row="2" 
+                                    Margin="20,10,20,20"/>
 
                 </Grid>
             </Border>

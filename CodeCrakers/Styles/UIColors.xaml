@@ -37,6 +37,12 @@
     <SolidColorBrush x:Key="panelOverColor" Color="#281269"/>
     <SolidColorBrush x:Key="panelActiveColor" Color="#2B1372"/>
 
+    <!--Platform Colors-->
+    <SolidColorBrush x:Key="codeforcesColor" Color="#1F8CEB"/>
+    <SolidColorBrush x:Key="leetcodeColor" Color="#FFA116"/>
+    <SolidColorBrush x:Key="codechefColor" Color="#5B9638"/>
+    <SolidColorBrush x:Key="atcoderColor" Color="#00C851"/>
+
     <!--Button Colors-->
     <!--TextBox Colors-->
     <!--Etc-->

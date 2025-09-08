@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS Users(
 CREATE TABLE IF NOT EXISTS UserProfiles(
     UserId     INTEGER PRIMARY KEY,
     Codeforces TEXT,
+    LeetCode   TEXT,
     Codechef   TEXT,
     Atcoder    TEXT,
     FOREIGN KEY(UserId) REFERENCES Users(Id) ON DELETE CASCADE

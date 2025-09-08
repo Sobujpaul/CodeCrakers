@@ -1,0 +1,375 @@
+<UserControl x:Class="CodeCrakers.Views.PlatformPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Border Grid.Row="0" 
+                CornerRadius="0,10,0,0"
+                Background="{StaticResource panelColor}">
+            <StackPanel Orientation="Horizontal" 
+                        VerticalAlignment="Center" 
+                        Margin="20,0">
+                <fa:IconImage Icon="Globe" 
+                              Style="{StaticResource menuButtonIcon}"
+                              Margin="0,0,10,0"/>
+                <TextBlock Text="Platform Settings" 
+                           Foreground="{StaticResource titleColor1}"
+                           FontFamily="Montserrat"
+                           FontSize="24"
+                           FontWeight="Medium"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Content Area -->
+        <ScrollViewer Grid.Row="1" 
+                      VerticalScrollBarVisibility="Auto"
+                      Padding="20">
+            <StackPanel>
+                
+                <!-- Instructions -->
+                <Border CornerRadius="10" 
+                        Background="{StaticResource panelColor}"
+                        Padding="20"
+                        Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="Connect Your Coding Platforms" 
+                                   Foreground="{StaticResource titleColor1}"
+                                   FontFamily="Montserrat"
+                                   FontSize="18"
+                                   FontWeight="Medium"
+                                   Margin="0,0,0,10"/>
+                        <TextBlock Text="Enter your usernames for each platform to start tracking your progress. We'll fetch your data automatically!" 
+                                   Foreground="{StaticResource plainTextColor1}"
+                                   FontFamily="Montserrat"
+                                   FontSize="14"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Platform Settings -->
+                <StackPanel>
+                    
+                    <!-- Codeforces -->
+                    <Border CornerRadius="10" 
+                            Background="{StaticResource panelColor}"
+                            Padding="20"
+                            Margin="0,0,0,15">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,15">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <fa:IconImage Icon="Code" 
+                                                  Foreground="{StaticResource color1}"
+                                                  Width="20" Height="20"
+                                                  Margin="0,0,10,0"/>
+                                    <TextBlock Text="Codeforces" 
+                                               Foreground="{StaticResource titleColor1}"
+                                               FontFamily="Montserrat"
+                                               FontSize="16"
+                                               FontWeight="Medium"/>
+                                </StackPanel>
+                                <TextBlock Text="Enter your Codeforces username to track contests, problems, and rating changes." 
+                                           Foreground="{StaticResource plainTextColor1}"
+                                           FontFamily="Montserrat"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Row="1" Grid.Column="0">
+                                <TextBox x:Name="txtCodeforces" 
+                                         Text=""
+                                         FontFamily="Montserrat"
+                                         FontSize="14"
+                                         Foreground="White"
+                                         CaretBrush="LightGray"
+                                         BorderBrush="DarkGray"
+                                         BorderThickness="0,0,0,1"
+                                         Background="Transparent"
+                                         Padding="10,8"
+                                         VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <Button x:Name="btnTestCodeforces" 
+                                    Grid.Row="1" Grid.Column="1"
+                                    Content="Test"
+                                    FontFamily="Montserrat"
+                                    FontSize="12"
+                                    Foreground="White"
+                                    Background="{StaticResource color1}"
+                                    BorderThickness="0"
+                                    Margin="10,0,0,0"
+                                    Click="btnTestCodeforces_Click">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border CornerRadius="5" 
+                                                Background="{TemplateBinding Background}">
+                                            <ContentPresenter VerticalAlignment="Center" 
+                                                              HorizontalAlignment="Center"
+                                                              Margin="10,5"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- LeetCode -->
+                    <Border CornerRadius="10" 
+                            Background="{StaticResource panelColor}"
+                            Padding="20"
+                            Margin="0,0,0,15">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,15">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <fa:IconImage Icon="Code" 
+                                                  Foreground="{StaticResource color2}"
+                                                  Width="20" Height="20"
+                                                  Margin="0,0,10,0"/>
+                                    <TextBlock Text="LeetCode" 
+                                               Foreground="{StaticResource titleColor1}"
+                                               FontFamily="Montserrat"
+                                               FontSize="16"
+                                               FontWeight="Medium"/>
+                                </StackPanel>
+                                <TextBlock Text="Enter your LeetCode username to track problems solved and daily challenges." 
+                                           Foreground="{StaticResource plainTextColor1}"
+                                           FontFamily="Montserrat"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Row="1" Grid.Column="0">
+                                <TextBox x:Name="txtLeetCode" 
+                                         Text=""
+                                         FontFamily="Montserrat"
+                                         FontSize="14"
+                                         Foreground="White"
+                                         CaretBrush="LightGray"
+                                         BorderBrush="DarkGray"
+                                         BorderThickness="0,0,0,1"
+                                         Background="Transparent"
+                                         Padding="10,8"
+                                         VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <Button x:Name="btnTestLeetCode" 
+                                    Grid.Row="1" Grid.Column="1"
+                                    Content="Test"
+                                    FontFamily="Montserrat"
+                                    FontSize="12"
+                                    Foreground="White"
+                                    Background="{StaticResource color2}"
+                                    BorderThickness="0"
+                                    Margin="10,0,0,0"
+                                    Click="btnTestLeetCode_Click">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border CornerRadius="5" 
+                                                Background="{TemplateBinding Background}">
+                                            <ContentPresenter VerticalAlignment="Center" 
+                                                              HorizontalAlignment="Center"
+                                                              Margin="10,5"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- CodeChef -->
+                    <Border CornerRadius="10" 
+                            Background="{StaticResource panelColor}"
+                            Padding="20"
+                            Margin="0,0,0,15">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,15">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <fa:IconImage Icon="Code" 
+                                                  Foreground="{StaticResource color3}"
+                                                  Width="20" Height="20"
+                                                  Margin="0,0,10,0"/>
+                                    <TextBlock Text="CodeChef" 
+                                               Foreground="{StaticResource titleColor1}"
+                                               FontFamily="Montserrat"
+                                               FontSize="16"
+                                               FontWeight="Medium"/>
+                                </StackPanel>
+                                <TextBlock Text="Enter your CodeChef username to track contests, long challenges, and ratings." 
+                                           Foreground="{StaticResource plainTextColor1}"
+                                           FontFamily="Montserrat"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Row="1" Grid.Column="0">
+                                <TextBox x:Name="txtCodeChef" 
+                                         Text=""
+                                         FontFamily="Montserrat"
+                                         FontSize="14"
+                                         Foreground="White"
+                                         CaretBrush="LightGray"
+                                         BorderBrush="DarkGray"
+                                         BorderThickness="0,0,0,1"
+                                         Background="Transparent"
+                                         Padding="10,8"
+                                         VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <Button x:Name="btnTestCodeChef" 
+                                    Grid.Row="1" Grid.Column="1"
+                                    Content="Test"
+                                    FontFamily="Montserrat"
+                                    FontSize="12"
+                                    Foreground="White"
+                                    Background="{StaticResource color3}"
+                                    BorderThickness="0"
+                                    Margin="10,0,0,0"
+                                    Click="btnTestCodeChef_Click">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border CornerRadius="5" 
+                                                Background="{TemplateBinding Background}">
+                                            <ContentPresenter VerticalAlignment="Center" 
+                                                              HorizontalAlignment="Center"
+                                                              Margin="10,5"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- AtCoder -->
+                    <Border CornerRadius="10" 
+                            Background="{StaticResource panelColor}"
+                            Padding="20"
+                            Margin="0,0,0,20">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,15">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <fa:IconImage Icon="Code" 
+                                                  Foreground="{StaticResource color4}"
+                                                  Width="20" Height="20"
+                                                  Margin="0,0,10,0"/>
+                                    <TextBlock Text="AtCoder" 
+                                               Foreground="{StaticResource titleColor1}"
+                                               FontFamily="Montserrat"
+                                               FontSize="16"
+                                               FontWeight="Medium"/>
+                                </StackPanel>
+                                <TextBlock Text="Enter your AtCoder username to track contests and problem solving progress." 
+                                           Foreground="{StaticResource plainTextColor1}"
+                                           FontFamily="Montserrat"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Row="1" Grid.Column="0">
+                                <TextBox x:Name="txtAtCoder" 
+                                         Text=""
+                                         FontFamily="Montserrat"
+                                         FontSize="14"
+                                         Foreground="White"
+                                         CaretBrush="LightGray"
+                                         BorderBrush="DarkGray"
+                                         BorderThickness="0,0,0,1"
+                                         Background="Transparent"
+                                         Padding="10,8"
+                                         VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <Button x:Name="btnTestAtCoder" 
+                                    Grid.Row="1" Grid.Column="1"
+                                    Content="Test"
+                                    FontFamily="Montserrat"
+                                    FontSize="12"
+                                    Foreground="White"
+                                    Background="{StaticResource color4}"
+                                    BorderThickness="0"
+                                    Margin="10,0,0,0"
+                                    Click="btnTestAtCoder_Click">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border CornerRadius="5" 
+                                                Background="{TemplateBinding Background}">
+                                            <ContentPresenter VerticalAlignment="Center" 
+                                                              HorizontalAlignment="Center"
+                                                              Margin="10,5"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+                    </Border>
+                    
+                </StackPanel>
+                
+                <!-- Save Button -->
+                <Button x:Name="btnSaveSettings" 
+                        Content="Save Settings"
+                        FontFamily="Montserrat"
+                        FontSize="14"
+                        FontWeight="Medium"
+                        Foreground="White"
+                        Background="{StaticResource color5}"
+                        BorderThickness="0"
+                        HorizontalAlignment="Center"
+                        Click="btnSaveSettings_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border CornerRadius="8" 
+                                    Background="{TemplateBinding Background}">
+                                <ContentPresenter VerticalAlignment="Center" 
+                                                  HorizontalAlignment="Center"
+                                                  Margin="30,10"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
