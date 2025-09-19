@@ -7,5 +7,8 @@
         public string? LeetCode { get; set; }
         public string? Codechef { get; set; }
         public string? Atcoder { get; set; }
+        public string? Country { get; set; }
+        public string? University { get; set; }
+        public int IsHidden { get; set; }
     }
 }

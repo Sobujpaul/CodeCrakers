@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CodeCrakers.Models;
+using CodeCrakers.Data;
 
 namespace CodeCrakers.Services
 {
@@ -110,6 +111,38 @@ namespace CodeCrakers.Services
 
             var results = await Task.WhenAll(tasks);
             return results.ToList();
+        }
+
+        public async Task<AggregatedUserStats> BuildAggregatedStatsAsync(int userId)
+        {
+            var userRepo = new UserRepository();
+            var profileRepo = new UserProfileRepository();
+            var user = userRepo.GetById(userId);
+            var profile = profileRepo.GetByUserId(userId);
+
+            var aggregated = new AggregatedUserStats
+            {
+                UserId = userId,
+                DisplayName = user?.Username ?? $"User {userId}",
+                Country = profile?.Country,
+                University = profile?.University,
+                IsHidden = (profile?.IsHidden ?? 0) == 1,
+                Codeforces = profile?.Codeforces,
+                LeetCode = profile?.LeetCode,
+                Codechef = profile?.Codechef,
+                Atcoder = profile?.Atcoder
+            };
+
+            var stats = await GetAllPlatformStatsAsync(profile);
+            aggregated.CodeforcesStats = stats.FirstOrDefault(s => s.Platform.Equals("Codeforces", StringComparison.OrdinalIgnoreCase));
+            aggregated.LeetCodeStats = stats.FirstOrDefault(s => s.Platform.Equals("LeetCode", StringComparison.OrdinalIgnoreCase));
+            aggregated.CodechefStats = stats.FirstOrDefault(s => s.Platform.Equals("CodeChef", StringComparison.OrdinalIgnoreCase));
+            aggregated.AtcoderStats = stats.FirstOrDefault(s => s.Platform.Equals("AtCoder", StringComparison.OrdinalIgnoreCase));
+
+            aggregated.TotalProblemsSolved = stats.Sum(s => s?.ProblemsSolved ?? 0);
+            aggregated.HighestRating = stats.Any() ? stats.Max(s => s?.Rating ?? 0) : 0;
+
+            return aggregated;
         }
 
         public async Task<WeeklyStats> GetCombinedWeeklyStatsAsync(UserProfile profile)

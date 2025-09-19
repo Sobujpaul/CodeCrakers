@@ -14,6 +14,7 @@ namespace CodeCrakers
         private UserProfileRepository _profileRepo;
         private DashboardPage _dashboardPage;
         private PlatformPage _platformPage;
+        private LeaderboardPage _leaderboardPage;
 
         public MainWindow(int userId) // receive userId from LoginPage
         {
@@ -37,6 +38,10 @@ namespace CodeCrakers
                 System.Diagnostics.Debug.WriteLine("MainWindow: Creating PlatformPage...");
                 _platformPage = new PlatformPage(_userId);
                 System.Diagnostics.Debug.WriteLine("MainWindow: PlatformPage created");
+
+                System.Diagnostics.Debug.WriteLine("MainWindow: Creating LeaderboardPage...");
+                _leaderboardPage = new LeaderboardPage();
+                System.Diagnostics.Debug.WriteLine("MainWindow: LeaderboardPage created");
                 
                 // Set up event handlers
                 _platformPage.OnSettingsSaved = RefreshDashboard;
@@ -112,6 +117,12 @@ namespace CodeCrakers
             txtPageTitle.Text = "Platform Settings";
         }
 
+        private void NavigateToLeaderboard()
+        {
+            contentArea.Content = _leaderboardPage;
+            txtPageTitle.Text = "Leaderboard";
+        }
+
         private void RefreshDashboard()
         {
             // Always refresh the dashboard data, regardless of current view
@@ -130,6 +141,13 @@ namespace CodeCrakers
         public void OnPlatformClick(object sender, RoutedEventArgs e)
         {
             NavigateToPlatform();
+        }
+
+        public void OnLeaderboardClick(object sender, RoutedEventArgs e)
+        {
+            NavigateToLeaderboard();
+            // Refresh leaderboard data when tab is clicked
+            _leaderboardPage?.RefreshData();
         }
 
         public void OnNotificationClick(object sender, RoutedEventArgs e)

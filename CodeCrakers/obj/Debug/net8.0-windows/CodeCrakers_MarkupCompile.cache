@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\pranto\Desktop\pppp\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\
 CodeCrakers
 none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
-C:\Users\pranto\Desktop\pppp\CodeCrakers\CodeCrakers\App.xaml
-7-430346284
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\App.xaml
+9-1510911791
 
-211897355825
-2131623443041
-MainWindow.xaml;Styles\ButtonStyles.xaml;Styles\UIColors.xaml;Views\DashboardPage.xaml;Views\LoginPage.xaml;Views\PlatformPage.xaml;Views\SignUpPage.xaml;
+241047481866
+213738264465
+MainWindow.xaml;Styles\ButtonStyles.xaml;Styles\UIColors.xaml;Views\DashboardPage.xaml;Views\LeaderboardPage.xaml;Views\LoginPage.xaml;Views\PlatformPage.xaml;Views\SignUpPage.xaml;Views\UserDetailWindow.xaml;
 
 False
 

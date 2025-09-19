@@ -153,6 +153,31 @@ namespace CodeCrakers.Models
         public bool IsConnected { get; set; }
     }
 
+    public class AggregatedUserStats
+    {
+        public int UserId { get; set; }
+        public int Rank { get; set; }
+        public string DisplayName { get; set; }
+        public string Country { get; set; }
+        public string University { get; set; }
+        public bool IsHidden { get; set; }
+
+        public string Codeforces { get; set; }
+        public string LeetCode { get; set; }
+        public string Codechef { get; set; }
+        public string Atcoder { get; set; }
+
+        // Per-platform stats (optional if not connected)
+        public PlatformStats CodeforcesStats { get; set; }
+        public PlatformStats LeetCodeStats { get; set; }
+        public PlatformStats CodechefStats { get; set; }
+        public PlatformStats AtcoderStats { get; set; }
+
+        // Derived
+        public int TotalProblemsSolved { get; set; }
+        public int HighestRating { get; set; }
+    }
+
     public class WeeklyStats
     {
         public int ProblemsSolved { get; set; }

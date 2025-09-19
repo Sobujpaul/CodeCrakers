@@ -92,6 +92,17 @@
                         </StackPanel>
 
                     </RadioButton>
+
+                    <RadioButton  Style="{StaticResource menuButton}"
+                                  Tag="{StaticResource color5}"
+                                  Click="OnLeaderboardClick">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:IconImage Icon="Table" Style="{StaticResource menuButtonIcon}"/>
+                            <TextBlock Text="Leaderboard" Style="{StaticResource menuButtonText}"/>
+
+                        </StackPanel>
+
+                    </RadioButton>
                     
                 </StackPanel>
                 

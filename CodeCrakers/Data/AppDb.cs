@@ -44,15 +44,49 @@ CREATE TABLE IF NOT EXISTS UserProfiles(
     LeetCode   TEXT,
     Codechef   TEXT,
     Atcoder    TEXT,
+    -- Optional metadata columns (added via migration below if missing)
+    Country    TEXT,
+    University TEXT,
+    IsHidden   INTEGER DEFAULT 0,
     FOREIGN KEY(UserId) REFERENCES Users(Id) ON DELETE CASCADE
 );";
                 cmd.ExecuteNonQuery();
             }
+
+            // Lightweight migration: add columns if they don't exist yet
+            EnsureColumn(con, "UserProfiles", "Country", "TEXT", null);
+            EnsureColumn(con, "UserProfiles", "University", "TEXT", null);
+            EnsureColumn(con, "UserProfiles", "IsHidden", "INTEGER", "0");
         }
 
         public static SqliteConnection GetConnection()
         {
             return new SqliteConnection(ConnectionString);
+        }
+
+        private static void EnsureColumn(SqliteConnection connection, string table, string column, string type, string defaultValue)
+        {
+            using var checkCmd = connection.CreateCommand();
+            checkCmd.CommandText = $"PRAGMA table_info({table});";
+            using var reader = checkCmd.ExecuteReader();
+            bool exists = false;
+            while (reader.Read())
+            {
+                var name = reader.GetString(1);
+                if (string.Equals(name, column, StringComparison.OrdinalIgnoreCase))
+                {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists)
+            {
+                var defaultClause = defaultValue == null ? string.Empty : $" DEFAULT {defaultValue}";
+                using var alterCmd = connection.CreateCommand();
+                alterCmd.CommandText = $"ALTER TABLE {table} ADD COLUMN {column} {type}{defaultClause};";
+                alterCmd.ExecuteNonQuery();
+            }
         }
     }
 }
