@@ -181,3 +181,7 @@ C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-wi
 C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\GeneratedInternalTypeHelper.g.cs
 C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\LeaderboardPage.g.cs
 C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\LeaderboardPage.baml
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\PlatformDetailWindow.baml
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\PlatformDetailWindow.g.cs
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\ProfilePage.baml
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\ProfilePage.g.cs

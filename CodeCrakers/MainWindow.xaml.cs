@@ -15,6 +15,7 @@ namespace CodeCrakers
         private DashboardPage _dashboardPage;
         private PlatformPage _platformPage;
         private LeaderboardPage _leaderboardPage;
+        private ProfilePage _profilePage;
 
         public MainWindow(int userId) // receive userId from LoginPage
         {
@@ -43,9 +44,17 @@ namespace CodeCrakers
                 _leaderboardPage = new LeaderboardPage();
                 System.Diagnostics.Debug.WriteLine("MainWindow: LeaderboardPage created");
                 
+                System.Diagnostics.Debug.WriteLine("MainWindow: Creating ProfilePage...");
+                _profilePage = new ProfilePage(_userId);
+                System.Diagnostics.Debug.WriteLine("MainWindow: ProfilePage created");
+                
                 // Set up event handlers
                 _platformPage.OnSettingsSaved = RefreshDashboard;
+                _profilePage.OnProfileUpdated = RefreshProfileInfo;
                 System.Diagnostics.Debug.WriteLine("MainWindow: Event handlers set up");
+                
+                // Load profile information
+                LoadProfileInfo();
                 
                 // Show dashboard by default
                 System.Diagnostics.Debug.WriteLine("MainWindow: Navigating to dashboard...");
@@ -123,6 +132,12 @@ namespace CodeCrakers
             txtPageTitle.Text = "Leaderboard";
         }
 
+        private void NavigateToProfile()
+        {
+            contentArea.Content = _profilePage;
+            txtPageTitle.Text = "Profile Settings";
+        }
+
         private void RefreshDashboard()
         {
             // Always refresh the dashboard data, regardless of current view
@@ -147,7 +162,7 @@ namespace CodeCrakers
         {
             NavigateToLeaderboard();
             // Refresh leaderboard data when tab is clicked
-            _leaderboardPage?.RefreshData();
+            _leaderboardPage?.LoadLeaderboard();
         }
 
         public void OnNotificationClick(object sender, RoutedEventArgs e)
@@ -162,6 +177,42 @@ namespace CodeCrakers
             // TODO: Implement suggestions page
             MessageBox.Show("Suggestions feature coming soon!", "Feature Preview", 
                 MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void ProfileSection_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            NavigateToProfile();
+        }
+
+        private void LoadProfileInfo()
+        {
+            try
+            {
+                var userRepo = new UserRepository();
+                var user = userRepo.GetById(_userId);
+                
+                if (user != null)
+                {
+                    txtProfileUsername.Text = user.Username;
+                    txtProfileEmail.Text = user.Email;
+                }
+                else
+                {
+                    txtProfileUsername.Text = "Unknown User";
+                    txtProfileEmail.Text = "";
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading profile info: {ex.Message}");
+                txtProfileUsername.Text = "Error";
+                txtProfileEmail.Text = "";
+            }
+        }
+
+        private void RefreshProfileInfo()
+        {
+            LoadProfileInfo();
         }
 
     }

@@ -89,5 +89,72 @@ namespace CodeCrakers.Data
                 PasswordHash = reader.GetString(3)
             };
         }
+
+        // ✅ Check if username exists (excluding current user)
+        public bool UsernameExists(string username, int excludeUserId)
+        {
+            using var con = AppDb.GetConnection();
+            con.Open();
+
+            const string sql = @"SELECT 1 FROM Users WHERE Username=@u AND Id!=@id LIMIT 1;";
+            using var cmd = new SqliteCommand(sql, con);
+            cmd.Parameters.AddWithValue("@u", username);
+            cmd.Parameters.AddWithValue("@id", excludeUserId);
+
+            var result = cmd.ExecuteScalar();
+            return result != null;
+        }
+
+        // ✅ Check if email exists (excluding current user)
+        public bool EmailExists(string email, int excludeUserId)
+        {
+            using var con = AppDb.GetConnection();
+            con.Open();
+
+            const string sql = @"SELECT 1 FROM Users WHERE Email=@e AND Id!=@id LIMIT 1;";
+            using var cmd = new SqliteCommand(sql, con);
+            cmd.Parameters.AddWithValue("@e", email);
+            cmd.Parameters.AddWithValue("@id", excludeUserId);
+
+            var result = cmd.ExecuteScalar();
+            return result != null;
+        }
+
+        // ✅ Validate password for a specific user
+        public bool ValidatePassword(int userId, string rawPassword)
+        {
+            var hash = PasswordHasher.Hash(rawPassword);
+
+            using var con = AppDb.GetConnection();
+            con.Open();
+
+            const string sql = @"SELECT 1 FROM Users WHERE Id=@id AND PasswordHash=@p LIMIT 1;";
+            using var cmd = new SqliteCommand(sql, con);
+            cmd.Parameters.AddWithValue("@id", userId);
+            cmd.Parameters.AddWithValue("@p", hash);
+
+            var result = cmd.ExecuteScalar();
+            return result != null;
+        }
+
+        // ✅ Update user information
+        public bool UpdateUser(User user)
+        {
+            using var con = AppDb.GetConnection();
+            con.Open();
+
+            const string sql = @"UPDATE Users 
+                                SET Username=@u, Email=@e, PasswordHash=@p 
+                                WHERE Id=@id;";
+
+            using var cmd = new SqliteCommand(sql, con);
+            cmd.Parameters.AddWithValue("@u", user.Username);
+            cmd.Parameters.AddWithValue("@e", user.Email);
+            cmd.Parameters.AddWithValue("@p", user.PasswordHash);
+            cmd.Parameters.AddWithValue("@id", user.Id);
+
+            int rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected > 0;
+        }
     }
 }

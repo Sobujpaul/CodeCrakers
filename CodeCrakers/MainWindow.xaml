@@ -34,8 +34,15 @@
                     </LinearGradientBrush>
                 </Border.Background>
 
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal"
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Logo Section -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal"
                                 Height="35"
                                 Margin="15,25,0,40">
                         <Image Source="/Images/logo1.png" Height="30"/>
@@ -46,65 +53,97 @@
                                    FontWeight="Medium"
                                    VerticalAlignment="Center"
                                    Margin="10,0,0,0"/>
-
                     </StackPanel>
-                    <RadioButton  Style="{StaticResource menuButton}"
-                                  Tag="{StaticResource color1}"
-                                  Click="OnDashboardClick">
-                        <StackPanel Orientation="Horizontal">
-                              <fa:IconImage Icon="Home" Style="{StaticResource menuButtonIcon}"/>
-                              <TextBlock Text="Dashboard" Style="{StaticResource menuButtonText}"/>
-                            
-                        </StackPanel>
-                        
-                    </RadioButton>
-
-                    <RadioButton  Style="{StaticResource menuButton}"
-                                  Tag="{StaticResource color2}"
-                                  Click="OnNotificationClick">
-                        <StackPanel Orientation="Horizontal">
-                            <fa:IconImage Icon="Bell" Style="{StaticResource menuButtonIcon}"/>
-                            <TextBlock Text="Notification" Style="{StaticResource menuButtonText}"/>
-
-                        </StackPanel>
-
-                    </RadioButton>
-
-
-                    <RadioButton  Style="{StaticResource menuButton}"
-                                  Tag="{StaticResource color3}"
-                                  Click="OnSuggestionClick">
-                        <StackPanel Orientation="Horizontal">
-                            <fa:IconImage Icon="Lightbulb" Style="{StaticResource menuButtonIcon}"/>
-                            <TextBlock Text="Suggestion" Style="{StaticResource menuButtonText}"/>
-
-                        </StackPanel>
-
-                    </RadioButton>
-
-                    <RadioButton  Style="{StaticResource menuButton}"
-                                  Tag="{StaticResource color4}"
-                                  Click="OnPlatformClick">
-                        <StackPanel Orientation="Horizontal">
-                            <fa:IconImage Icon="Globe" Style="{StaticResource menuButtonIcon}"/>
-                            <TextBlock Text="Platform" Style="{StaticResource menuButtonText}"/>
-
-                        </StackPanel>
-
-                    </RadioButton>
-
-                    <RadioButton  Style="{StaticResource menuButton}"
-                                  Tag="{StaticResource color5}"
-                                  Click="OnLeaderboardClick">
-                        <StackPanel Orientation="Horizontal">
-                            <fa:IconImage Icon="Table" Style="{StaticResource menuButtonIcon}"/>
-                            <TextBlock Text="Leaderboard" Style="{StaticResource menuButtonText}"/>
-
-                        </StackPanel>
-
-                    </RadioButton>
                     
-                </StackPanel>
+                    <!-- Navigation Menu -->
+                    <StackPanel Grid.Row="1">
+                        <RadioButton  Style="{StaticResource menuButton}"
+                                      Tag="{StaticResource color1}"
+                                      Click="OnDashboardClick">
+                            <StackPanel Orientation="Horizontal">
+                                  <fa:IconImage Icon="Home" Style="{StaticResource menuButtonIcon}"/>
+                                  <TextBlock Text="Dashboard" Style="{StaticResource menuButtonText}"/>
+                                
+                            </StackPanel>
+                            
+                        </RadioButton>
+
+                        <RadioButton  Style="{StaticResource menuButton}"
+                                      Tag="{StaticResource color2}"
+                                      Click="OnNotificationClick">
+                            <StackPanel Orientation="Horizontal">
+                                <fa:IconImage Icon="Bell" Style="{StaticResource menuButtonIcon}"/>
+                                <TextBlock Text="Notification" Style="{StaticResource menuButtonText}"/>
+
+                            </StackPanel>
+
+                        </RadioButton>
+
+
+                        <RadioButton  Style="{StaticResource menuButton}"
+                                      Tag="{StaticResource color3}"
+                                      Click="OnSuggestionClick">
+                            <StackPanel Orientation="Horizontal">
+                                <fa:IconImage Icon="Lightbulb" Style="{StaticResource menuButtonIcon}"/>
+                                <TextBlock Text="Suggestion" Style="{StaticResource menuButtonText}"/>
+
+                            </StackPanel>
+
+                        </RadioButton>
+
+                        <RadioButton  Style="{StaticResource menuButton}"
+                                      Tag="{StaticResource color4}"
+                                      Click="OnPlatformClick">
+                            <StackPanel Orientation="Horizontal">
+                                <fa:IconImage Icon="Globe" Style="{StaticResource menuButtonIcon}"/>
+                                <TextBlock Text="Platform" Style="{StaticResource menuButtonText}"/>
+
+                            </StackPanel>
+
+                        </RadioButton>
+
+                        <RadioButton  Style="{StaticResource menuButton}"
+                                      Tag="{StaticResource color5}"
+                                      Click="OnLeaderboardClick">
+                            <StackPanel Orientation="Horizontal">
+                                <fa:IconImage Icon="Table" Style="{StaticResource menuButtonIcon}"/>
+                                <TextBlock Text="Leaderboard" Style="{StaticResource menuButtonText}"/>
+
+                            </StackPanel>
+
+                        </RadioButton>
+                    </StackPanel>
+                    
+                    <!-- Profile Section -->
+                    <Border Grid.Row="2" 
+                            Background="{StaticResource panelColor}"
+                            CornerRadius="10"
+                            Margin="15,0,15,15"
+                            Padding="10"
+                            MouseLeftButtonDown="ProfileSection_MouseLeftButtonDown"
+                            Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:IconImage Icon="User" 
+                                         Foreground="{StaticResource titleColor2}"
+                                         Width="20" 
+                                         Height="20"
+                                         VerticalAlignment="Center"/>
+                            <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                                <TextBlock x:Name="txtProfileUsername" 
+                                           Text="Loading..."
+                                           Foreground="{StaticResource titleColor2}"
+                                           FontFamily="Montserrat"
+                                           FontSize="14"
+                                           FontWeight="Medium"/>
+                                <TextBlock x:Name="txtProfileEmail" 
+                                           Text=""
+                                           Foreground="{StaticResource plainTextColor1}"
+                                           FontFamily="Montserrat"
+                                           FontSize="12"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
                 
             </Border>
 

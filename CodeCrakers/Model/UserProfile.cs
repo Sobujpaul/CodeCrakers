@@ -10,5 +10,10 @@
         public string? Country { get; set; }
         public string? University { get; set; }
         public int IsHidden { get; set; }
+        
+        // Additional properties for leaderboard
+        public string? DisplayName { get; set; }
+        public int TotalRating { get; set; }
+        public int TotalSolved { get; set; }
     }
 }

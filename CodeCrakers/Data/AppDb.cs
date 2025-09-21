@@ -48,6 +48,10 @@ CREATE TABLE IF NOT EXISTS UserProfiles(
     Country    TEXT,
     University TEXT,
     IsHidden   INTEGER DEFAULT 0,
+    -- Leaderboard columns
+    DisplayName TEXT,
+    TotalRating INTEGER DEFAULT 0,
+    TotalSolved INTEGER DEFAULT 0,
     FOREIGN KEY(UserId) REFERENCES Users(Id) ON DELETE CASCADE
 );";
                 cmd.ExecuteNonQuery();
@@ -57,6 +61,9 @@ CREATE TABLE IF NOT EXISTS UserProfiles(
             EnsureColumn(con, "UserProfiles", "Country", "TEXT", null);
             EnsureColumn(con, "UserProfiles", "University", "TEXT", null);
             EnsureColumn(con, "UserProfiles", "IsHidden", "INTEGER", "0");
+            EnsureColumn(con, "UserProfiles", "DisplayName", "TEXT", null);
+            EnsureColumn(con, "UserProfiles", "TotalRating", "INTEGER", "0");
+            EnsureColumn(con, "UserProfiles", "TotalSolved", "INTEGER", "0");
         }
 
         public static SqliteConnection GetConnection()
