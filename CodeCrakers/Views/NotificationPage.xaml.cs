@@ -9,20 +9,80 @@ using System.Diagnostics;
 using System.Net.Http;
 using Newtonsoft.Json;
 using FontAwesome.Sharp;
+using CodeCrakers.Services;
+using System.Net.NetworkInformation;
+using System.Windows.Threading;
 
 namespace CodeCrakers.Views
 {
     public partial class NotificationPage : UserControl
     {
         private List<ContestNotification> notifications = new List<ContestNotification>();
-        private List<Contest> upcomingContests = new List<Contest>();
+        private List<ClistContest> upcomingContests = new List<ClistContest>();
         private HttpClient httpClient;
+        private ClistScraperService clistScraper;
+        private DispatcherTimer autoRefreshTimer;
+        private bool isRefreshing;
 
         public NotificationPage()
         {
             InitializeComponent();
             httpClient = new HttpClient();
+            clistScraper = new ClistScraperService();
+            this.Loaded += NotificationPage_Loaded;
+            this.Unloaded += NotificationPage_Unloaded;
             LoadData();
+        }
+
+        private void NotificationPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Start periodic auto-refresh (every 10 minutes)
+                autoRefreshTimer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMinutes(10)
+                };
+                autoRefreshTimer.Tick += AutoRefreshTimer_Tick;
+                autoRefreshTimer.Start();
+
+                // Listen for network availability changes
+                NetworkChange.NetworkAvailabilityChanged += NetworkChange_NetworkAvailabilityChanged;
+            }
+            catch { }
+        }
+
+        private void NotificationPage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (autoRefreshTimer != null)
+                {
+                    autoRefreshTimer.Tick -= AutoRefreshTimer_Tick;
+                    autoRefreshTimer.Stop();
+                    autoRefreshTimer = null;
+                }
+
+                NetworkChange.NetworkAvailabilityChanged -= NetworkChange_NetworkAvailabilityChanged;
+
+                clistScraper?.Dispose();
+                httpClient?.Dispose();
+            }
+            catch { }
+        }
+
+        private async void AutoRefreshTimer_Tick(object? sender, EventArgs e)
+        {
+            await SafeRefreshAsync();
+        }
+
+        private void NetworkChange_NetworkAvailabilityChanged(object? sender, NetworkAvailabilityEventArgs e)
+        {
+            if (e.IsAvailable)
+            {
+                // Refresh immediately when network comes back
+                Dispatcher.Invoke(async () => await SafeRefreshAsync());
+            }
         }
 
         private async void LoadData()
@@ -47,32 +107,13 @@ namespace CodeCrakers.Views
                 contestsPanel.Children.Clear();
                 contestsPanel.Children.Add(txtNoContests);
 
-                // Fetch upcoming contests from Codeforces API
-                var response = await httpClient.GetStringAsync("https://codeforces.com/api/contest.list");
-                var apiResponse = JsonConvert.DeserializeObject<CodeforcesApiResponse<List<Contest>>>(response);
+                // Fetch upcoming contests from clist.by
+                var clistContests = await clistScraper.GetUpcomingContestsAsync();
 
-                if (apiResponse.Status == "OK")
-                {
-                    upcomingContests.Clear();
-                    var currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+                upcomingContests.Clear();
+                upcomingContests.AddRange(clistContests);
 
-                    foreach (var contest in apiResponse.Result)
-                    {
-                        if (contest.Phase == "BEFORE" && contest.StartTimeSeconds > currentTime)
-                        {
-                            upcomingContests.Add(contest);
-                        }
-                    }
-
-                    // Sort by start time
-                    upcomingContests.Sort((a, b) => a.StartTimeSeconds.CompareTo(b.StartTimeSeconds));
-
-                    DisplayUpcomingContests();
-                }
-                else
-                {
-                    txtNoContests.Text = "Failed to load contests.";
-                }
+                DisplayUpcomingContests();
             }
             catch (Exception ex)
             {
@@ -99,7 +140,7 @@ namespace CodeCrakers.Views
             }
         }
 
-        private Border CreateContestItem(Contest contest)
+        private Border CreateContestItem(ClistContest contest)
         {
             var border = new Border
             {
@@ -124,7 +165,7 @@ namespace CodeCrakers.Views
                 Margin = new Thickness(0, 0, 0, 5)
             };
 
-            var startTime = DateTimeOffset.FromUnixTimeSeconds(contest.StartTimeSeconds);
+            var startTime = new DateTimeOffset(contest.StartTimeUtc, TimeSpan.Zero);
             var timeText = new TextBlock
             {
                 Text = $"Starts: {startTime:MMM dd, yyyy HH:mm} UTC",
@@ -136,7 +177,7 @@ namespace CodeCrakers.Views
 
             var durationText = new TextBlock
             {
-                Text = $"Duration: {TimeSpan.FromSeconds(contest.DurationSeconds):h\\:mm}",
+                Text = contest.Duration > TimeSpan.Zero ? $"Duration: {contest.Duration:h\\:mm}" : "",
                 FontFamily = new FontFamily("Montserrat"),
                 FontSize = 12,
                 Foreground = (Brush)FindResource("plainTextColor1")
@@ -174,7 +215,7 @@ namespace CodeCrakers.Views
             {
                 try
                 {
-                    var url = $"https://codeforces.com/contest/{contest.Id}";
+                    var url = string.IsNullOrWhiteSpace(contest.Url) ? "https://clist.by/?view=list" : contest.Url;
                     Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
                 }
                 catch (Exception ex)
@@ -195,7 +236,7 @@ namespace CodeCrakers.Views
             // Add notifications for upcoming contests
             foreach (var contest in upcomingContests.Take(3))
             {
-                var startTime = DateTimeOffset.FromUnixTimeSeconds(contest.StartTimeSeconds);
+                var startTime = new DateTimeOffset(contest.StartTimeUtc, TimeSpan.Zero);
                 var timeUntilStart = startTime - DateTimeOffset.Now;
                 
                 if (timeUntilStart.TotalHours <= 24 && timeUntilStart.TotalHours > 0)
@@ -208,7 +249,7 @@ namespace CodeCrakers.Views
                         Timestamp = DateTimeOffset.Now,
                         IsRead = false,
                         Type = NotificationType.ContestReminder,
-                        ContestId = contest.Id
+                        ContestId = null
                     });
                 }
             }
@@ -342,11 +383,11 @@ namespace CodeCrakers.Views
                 }
 
                 // If it's a contest notification, open the contest
-                if (notification.Type == NotificationType.ContestReminder && notification.ContestId.HasValue)
+                if (notification.Type == NotificationType.ContestReminder)
                 {
                     try
                     {
-                        var url = $"https://codeforces.com/contest/{notification.ContestId}";
+                        var url = "https://clist.by/?view=list";
                         Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
                     }
                     catch (Exception ex)
@@ -396,9 +437,7 @@ namespace CodeCrakers.Views
 
         private async void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            await LoadUpcomingContests();
-            LoadNotifications();
-            UpdateNotificationCount();
+            await SafeRefreshAsync();
         }
 
         private void btnMarkAllRead_Click(object sender, RoutedEventArgs e)
@@ -409,6 +448,22 @@ namespace CodeCrakers.Views
             }
             DisplayNotifications();
             UpdateNotificationCount();
+        }
+
+        private async Task SafeRefreshAsync()
+        {
+            if (isRefreshing) return;
+            try
+            {
+                isRefreshing = true;
+                await LoadUpcomingContests();
+                LoadNotifications();
+                UpdateNotificationCount();
+            }
+            finally
+            {
+                isRefreshing = false;
+            }
         }
     }
 

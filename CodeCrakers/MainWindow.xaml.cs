@@ -167,9 +167,16 @@ namespace CodeCrakers
 
         public void OnNotificationClick(object sender, RoutedEventArgs e)
         {
-            // TODO: Implement notifications page
-            MessageBox.Show("Notifications feature coming soon!", "Feature Preview", 
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            try
+            {
+                var page = new CodeCrakers.Views.NotificationPage();
+                contentArea.Content = page;
+                txtPageTitle.Text = "Notifications";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening notifications: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         public void OnSuggestionClick(object sender, RoutedEventArgs e)
