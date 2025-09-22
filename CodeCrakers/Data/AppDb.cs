@@ -53,6 +53,54 @@ CREATE TABLE IF NOT EXISTS UserProfiles(
     TotalRating INTEGER DEFAULT 0,
     TotalSolved INTEGER DEFAULT 0,
     FOREIGN KEY(UserId) REFERENCES Users(Id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS ExternalUsers(
+    Id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    DisplayName TEXT NOT NULL,
+    Codeforces  TEXT,
+    LeetCode    TEXT,
+    Codechef    TEXT,
+    Atcoder     TEXT,
+    Country     TEXT,
+    University  TEXT,
+    AddedAt     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    AddedBy     TEXT NOT NULL,
+    MaxRating   INTEGER DEFAULT 0,
+    TotalSolved INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS Contests(
+    Id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name                TEXT NOT NULL,
+    Platform            TEXT NOT NULL,
+    StartTime           TEXT NOT NULL,
+    DurationSeconds     INTEGER NOT NULL,
+    Url                 TEXT,
+    PlatformContestId   INTEGER NOT NULL,
+    Description         TEXT,
+    Type                INTEGER DEFAULT 0,
+    CreatedAt           TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    IsActive            INTEGER DEFAULT 1,
+    UNIQUE(Platform, PlatformContestId)
+);
+
+CREATE TABLE IF NOT EXISTS Notifications(
+    Id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserId          INTEGER,
+    ContestId       INTEGER,
+    Title           TEXT NOT NULL,
+    Message         TEXT NOT NULL,
+    Type            INTEGER NOT NULL,
+    Priority        INTEGER DEFAULT 1,
+    CreatedAt       TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ScheduledFor    TEXT,
+    IsRead          INTEGER DEFAULT 0,
+    IsActive        INTEGER DEFAULT 1,
+    ActionUrl       TEXT,
+    IconClass       TEXT,
+    FOREIGN KEY(UserId) REFERENCES Users(Id) ON DELETE CASCADE,
+    FOREIGN KEY(ContestId) REFERENCES Contests(Id) ON DELETE CASCADE
 );";
                 cmd.ExecuteNonQuery();
             }
@@ -64,6 +112,18 @@ CREATE TABLE IF NOT EXISTS UserProfiles(
             EnsureColumn(con, "UserProfiles", "DisplayName", "TEXT", null);
             EnsureColumn(con, "UserProfiles", "TotalRating", "INTEGER", "0");
             EnsureColumn(con, "UserProfiles", "TotalSolved", "INTEGER", "0");
+            
+            // Ensure ExternalUsers table columns (for future migrations)
+            EnsureColumn(con, "ExternalUsers", "MaxRating", "INTEGER", "0");
+            EnsureColumn(con, "ExternalUsers", "TotalSolved", "INTEGER", "0");
+            
+            // Ensure Contest and Notification table columns (for future migrations)
+            EnsureColumn(con, "Contests", "Type", "INTEGER", "0");
+            EnsureColumn(con, "Contests", "IsActive", "INTEGER", "1");
+            EnsureColumn(con, "Notifications", "Priority", "INTEGER", "1");
+            EnsureColumn(con, "Notifications", "ScheduledFor", "TEXT", null);
+            EnsureColumn(con, "Notifications", "ActionUrl", "TEXT", null);
+            EnsureColumn(con, "Notifications", "IconClass", "TEXT", null);
         }
 
         public static SqliteConnection GetConnection()

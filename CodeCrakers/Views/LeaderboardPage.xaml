@@ -8,65 +8,255 @@
     </UserControl.Resources>
 
     <StackPanel Margin="10">
+        <!-- Add External User Section -->
+        <Expander Header="Add External User to Leaderboard" Margin="0,0,0,10" Background="{StaticResource panelColor}" 
+                  Foreground="{StaticResource titleColor2}" FontFamily="Montserrat" FontWeight="Medium">
+            <StackPanel Margin="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- First Row -->
+                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,5,5">
+                        <TextBlock Text="Display Name:" Foreground="{StaticResource titleColor3}" FontFamily="Montserrat" FontSize="12"/>
+                        <TextBox x:Name="txtDisplayName" Margin="0,2,0,0" Background="{StaticResource panelOverColor}" 
+                                 Foreground="{StaticResource titleColor2}" BorderBrush="{StaticResource color1}" Padding="5"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="5,0,0,5">
+                        <TextBlock Text="Country (Optional):" Foreground="{StaticResource titleColor3}" FontFamily="Montserrat" FontSize="12"/>
+                        <TextBox x:Name="txtNewCountry" Margin="0,2,0,0" Background="{StaticResource panelOverColor}" 
+                                 Foreground="{StaticResource titleColor2}" BorderBrush="{StaticResource color1}" Padding="5"/>
+                    </StackPanel>
+                    
+                    <!-- Second Row -->
+                    <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,5,5">
+                        <TextBlock Text="Codeforces Username:" Foreground="{StaticResource titleColor3}" FontFamily="Montserrat" FontSize="12"/>
+                        <TextBox x:Name="txtCodeforcesUsername" Margin="0,2,0,0" Background="{StaticResource panelOverColor}" 
+                                 Foreground="{StaticResource titleColor2}" BorderBrush="{StaticResource codeforcesColor}" Padding="5"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="1" Grid.Column="1" Margin="5,0,0,5">
+                        <TextBlock Text="LeetCode Username:" Foreground="{StaticResource titleColor3}" FontFamily="Montserrat" FontSize="12"/>
+                        <TextBox x:Name="txtLeetCodeUsername" Margin="0,2,0,0" Background="{StaticResource panelOverColor}" 
+                                 Foreground="{StaticResource titleColor2}" BorderBrush="{StaticResource leetcodeColor}" Padding="5"/>
+                    </StackPanel>
+                    
+                    <!-- Third Row -->
+                    <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,5,5">
+                        <TextBlock Text="CodeChef Username:" Foreground="{StaticResource titleColor3}" FontFamily="Montserrat" FontSize="12"/>
+                        <TextBox x:Name="txtCodeChefUsername" Margin="0,2,0,0" Background="{StaticResource panelOverColor}" 
+                                 Foreground="{StaticResource titleColor2}" BorderBrush="{StaticResource codechefColor}" Padding="5"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="2" Grid.Column="1" Margin="5,0,0,5">
+                        <TextBlock Text="AtCoder Username:" Foreground="{StaticResource titleColor3}" FontFamily="Montserrat" FontSize="12"/>
+                        <TextBox x:Name="txtAtCoderUsername" Margin="0,2,0,0" Background="{StaticResource panelOverColor}" 
+                                 Foreground="{StaticResource titleColor2}" BorderBrush="{StaticResource atcoderColor}" Padding="5"/>
+                    </StackPanel>
+                    
+                    <!-- Fourth Row -->
+                    <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,5,5">
+                        <TextBlock Text="University (Optional):" Foreground="{StaticResource titleColor3}" FontFamily="Montserrat" FontSize="12"/>
+                        <TextBox x:Name="txtNewUniversity" Margin="0,2,0,0" Background="{StaticResource panelOverColor}" 
+                                 Foreground="{StaticResource titleColor2}" BorderBrush="{StaticResource color1}" Padding="5"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="3" Grid.Column="1" Margin="5,5,0,0" VerticalAlignment="Bottom">
+                        <Button x:Name="btnAddExternal" Content="Add to Leaderboard" Click="btnAddExternal_Click" 
+                                Background="{StaticResource color1}" Foreground="{StaticResource titleColor1}" 
+                                FontFamily="Montserrat" FontWeight="Medium" Padding="10,5" BorderBrush="Transparent" 
+                                Cursor="Hand" Height="30"/>
+                    </StackPanel>
+                </Grid>
+                
+                <TextBlock x:Name="txtAddStatus" Margin="0,5,0,0" Foreground="{StaticResource color3}" 
+                           FontFamily="Montserrat" FontSize="11" Visibility="Collapsed"/>
+            </StackPanel>
+        </Expander>
+        
         <!-- Filters & Sorting -->
         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-            <ComboBox x:Name="cmbSort" Width="150">
-                <ComboBoxItem Content="Rating" Tag="rating" IsSelected="True"/>
+            <ComboBox x:Name="cmbSort" Width="150" Background="{StaticResource panelOverColor}" 
+                      Foreground="{StaticResource titleColor2}" BorderBrush="{StaticResource color1}">
+                <ComboBoxItem Content="Max Rating" Tag="rating" IsSelected="True"/>
                 <ComboBoxItem Content="Solved Problems" Tag="solved"/>
+                <ComboBoxItem Content="Name" Tag="name"/>
             </ComboBox>
 
-            <TextBox x:Name="txtSearch" Width="200" Margin="10,0,0,0" Text="Search Codeforces" Foreground="Gray" GotFocus="txtSearch_GotFocus" LostFocus="txtSearch_LostFocus"/>
-            <TextBox x:Name="txtCountry" Width="150" Margin="10,0,0,0" Text="Country" Foreground="Gray" GotFocus="txtCountry_GotFocus" LostFocus="txtCountry_LostFocus"/>
-            <TextBox x:Name="txtUniversity" Width="150" Margin="10,0,0,0" Text="University" Foreground="Gray" GotFocus="txtUniversity_GotFocus" LostFocus="txtUniversity_LostFocus"/>
-            <Button Content="Apply" Click="btnApplyFilters_Click" Margin="10,0,0,0"/>
+            <TextBox x:Name="txtSearch" Width="200" Margin="10,0,0,0" Text="Search Name" Foreground="Gray" 
+                     Background="{StaticResource panelOverColor}" BorderBrush="{StaticResource color1}" Padding="5"
+                     GotFocus="txtSearch_GotFocus" LostFocus="txtSearch_LostFocus"/>
+            <TextBox x:Name="txtCountry" Width="150" Margin="10,0,0,0" Text="Country" Foreground="Gray" 
+                     Background="{StaticResource panelOverColor}" BorderBrush="{StaticResource color1}" Padding="5"
+                     GotFocus="txtCountry_GotFocus" LostFocus="txtCountry_LostFocus"/>
+            <TextBox x:Name="txtUniversity" Width="150" Margin="10,0,0,0" Text="University" Foreground="Gray" 
+                     Background="{StaticResource panelOverColor}" BorderBrush="{StaticResource color1}" Padding="5"
+                     GotFocus="txtUniversity_GotFocus" LostFocus="txtUniversity_LostFocus"/>
+            <Button Content="Apply Filters" Click="btnApplyFilters_Click" Margin="10,0,0,0" 
+                    Background="{StaticResource color2}" Foreground="{StaticResource titleColor1}" 
+                    FontFamily="Montserrat" BorderBrush="Transparent" Padding="10,5" Cursor="Hand"/>
         </StackPanel>
 
         <!-- Leaderboard Table -->
-        <DataGrid x:Name="dgLeaderboard" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True">
+        <DataGrid x:Name="dgLeaderboard" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
+                  Background="{StaticResource panelColor}" Foreground="{StaticResource titleColor2}" 
+                  RowBackground="{StaticResource panelOverColor}" AlternatingRowBackground="{StaticResource panelActiveColor}"
+                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource color1}" 
+                  FontFamily="Montserrat">
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="{StaticResource panelActiveColor}"/>
+                    <Setter Property="Foreground" Value="{StaticResource titleColor1}"/>
+                    <Setter Property="FontFamily" Value="Montserrat"/>
+                    <Setter Property="FontWeight" Value="Medium"/>
+                    <Setter Property="Padding" Value="10,5"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+            
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Rank" Binding="{Binding Rank}" Width="50"/>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="200"/>
+                <DataGridTextColumn Header="Rank" Binding="{Binding Rank}" Width="50">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Foreground" Value="{StaticResource color1}"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                
+                <DataGridTemplateColumn Header="Name" Width="200">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Medium"/>
+                                <Border Background="{StaticResource color3}" CornerRadius="8" Padding="4,1" Margin="5,0,0,0">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsExternal}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="EXT" FontSize="9" FontWeight="Bold" Foreground="Black"/>
+                                </Border>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTextColumn Header="Max Rating" Binding="{Binding MaxRating}" Width="100">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Foreground" Value="{StaticResource color2}"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                
+                <DataGridTextColumn Header="Problems Solved" Binding="{Binding ProblemsSolved}" Width="120">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="FontWeight" Value="Medium"/>
+                            <Setter Property="Foreground" Value="{StaticResource color4}"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
-                <DataGridTemplateColumn Header="Codeforces">
+                <DataGridTemplateColumn Header="CF" Width="60">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="{Binding HasCodeforces, Converter={StaticResource TickCrossConverter}}"
                                     Click="PlatformButton_Click"
                                     Tag="codeforces"
-                                    IsEnabled="{Binding HasCodeforces}"/>
+                                    IsEnabled="{Binding HasCodeforces}"
+                                    Background="{StaticResource codeforcesColor}"
+                                    Foreground="White" BorderBrush="Transparent"
+                                    Width="40" Height="25" Cursor="Hand"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="CodeChef">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="{Binding HasCodeChef, Converter={StaticResource TickCrossConverter}}"
-                                    Click="PlatformButton_Click"
-                                    Tag="codechef"
-                                    IsEnabled="{Binding HasCodeChef}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Header="LeetCode">
+                <DataGridTemplateColumn Header="LC" Width="60">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="{Binding HasLeetCode, Converter={StaticResource TickCrossConverter}}"
                                     Click="PlatformButton_Click"
                                     Tag="leetcode"
-                                    IsEnabled="{Binding HasLeetCode}"/>
+                                    IsEnabled="{Binding HasLeetCode}"
+                                    Background="{StaticResource leetcodeColor}"
+                                    Foreground="White" BorderBrush="Transparent"
+                                    Width="40" Height="25" Cursor="Hand"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="AtCoder">
+                <DataGridTemplateColumn Header="CC" Width="60">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding HasCodeChef, Converter={StaticResource TickCrossConverter}}"
+                                    Click="PlatformButton_Click"
+                                    Tag="codechef"
+                                    IsEnabled="{Binding HasCodeChef}"
+                                    Background="{StaticResource codechefColor}"
+                                    Foreground="White" BorderBrush="Transparent"
+                                    Width="40" Height="25" Cursor="Hand"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="AC" Width="60">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="{Binding HasAtCoder, Converter={StaticResource TickCrossConverter}}"
                                     Click="PlatformButton_Click"
                                     Tag="atcoder"
-                                    IsEnabled="{Binding HasAtCoder}"/>
+                                    IsEnabled="{Binding HasAtCoder}"
+                                    Background="{StaticResource atcoderColor}"
+                                    Foreground="White" BorderBrush="Transparent"
+                                    Width="40" Height="25" Cursor="Hand"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn Header="Actions" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Content="🔄" Click="btnRefresh_Click" 
+                                        Background="{StaticResource color6}" Foreground="White"
+                                        Width="25" Height="25" Margin="2" BorderBrush="Transparent"
+                                        ToolTip="Refresh Stats" Cursor="Hand"
+                                        FontSize="10"/>
+                                <Button Content="🗑" Click="btnDelete_Click" 
+                                        Background="{StaticResource color4}" Foreground="White"
+                                        Width="25" Height="25" Margin="2" BorderBrush="Transparent"
+                                        ToolTip="Remove from Leaderboard" Cursor="Hand"
+                                        FontSize="10">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsExternal}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

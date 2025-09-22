@@ -1,0 +1,120 @@
+<UserControl x:Class="CodeCrakers.Views.NotificationPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Section -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Notifications" FontFamily="Montserrat" FontSize="24" FontWeight="Bold" 
+                           Foreground="{StaticResource titleColor1}"/>
+                <TextBlock x:Name="txtNotificationCount" Text="No unread notifications" FontFamily="Montserrat" 
+                           FontSize="14" Foreground="{StaticResource plainTextColor1}" Margin="0,5,0,0"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button x:Name="btnRefresh" Content="🔄" Click="btnRefresh_Click" 
+                        Background="{StaticResource color6}" Foreground="White" 
+                        Width="35" Height="35" Margin="0,0,10,0" BorderBrush="Transparent"
+                        ToolTip="Refresh Notifications" Cursor="Hand" FontSize="14"/>
+                <Button x:Name="btnMarkAllRead" Content="✓" Click="btnMarkAllRead_Click" 
+                        Background="{StaticResource color3}" Foreground="White" 
+                        Width="35" Height="35" BorderBrush="Transparent"
+                        ToolTip="Mark All as Read" Cursor="Hand" FontSize="14"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Upcoming Contests Section -->
+        <Border Grid.Row="1" Background="{StaticResource panelColor}" CornerRadius="10" 
+                Padding="15" Margin="0,0,0,20">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                    <fa:IconImage Icon="Calendar" Width="20" Height="20" 
+                                  Foreground="{StaticResource color1}" VerticalAlignment="Center"/>
+                    <TextBlock Text="Upcoming Contests" FontFamily="Montserrat" FontSize="18" 
+                               FontWeight="Medium" Foreground="{StaticResource titleColor1}" 
+                               Margin="10,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <ScrollViewer x:Name="contestScrollViewer" MaxHeight="200" 
+                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel x:Name="contestsPanel">
+                        <!-- Contest items will be added dynamically -->
+                        <TextBlock x:Name="txtNoContests" Text="Loading upcoming contests..." 
+                                   Foreground="{StaticResource plainTextColor1}" FontFamily="Montserrat" 
+                                   HorizontalAlignment="Center" Margin="0,20"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </StackPanel>
+        </Border>
+
+        <!-- Notifications List -->
+        <Border Grid.Row="2" Background="{StaticResource panelColor}" CornerRadius="10" Padding="15">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                    <fa:IconImage Icon="Bell" Width="20" Height="20" 
+                                  Foreground="{StaticResource color2}" VerticalAlignment="Center"/>
+                    <TextBlock Text="All Notifications" FontFamily="Montserrat" FontSize="18" 
+                               FontWeight="Medium" Foreground="{StaticResource titleColor1}" 
+                               Margin="10,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <ScrollViewer Grid.Row="1" x:Name="notificationScrollViewer" 
+                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel x:Name="notificationsPanel">
+                        <!-- Notification items will be added dynamically -->
+                        <TextBlock x:Name="txtNoNotifications" Text="No notifications yet." 
+                                   Foreground="{StaticResource plainTextColor1}" FontFamily="Montserrat" 
+                                   HorizontalAlignment="Center" Margin="0,50" FontSize="16"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+
+    <!-- Notification Item Template (defined in code-behind) -->
+    <UserControl.Resources>
+        <Style x:Key="NotificationItemStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource panelOverColor}"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource panelActiveColor}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="ContestItemStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource panelOverColor}"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource panelActiveColor}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+</UserControl>

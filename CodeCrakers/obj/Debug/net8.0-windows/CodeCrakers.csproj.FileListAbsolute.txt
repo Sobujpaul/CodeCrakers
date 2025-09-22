@@ -185,3 +185,5 @@ C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-wi
 C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\PlatformDetailWindow.g.cs
 C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\ProfilePage.baml
 C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\ProfilePage.g.cs
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\NotificationPage.baml
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\NotificationPage.g.cs
