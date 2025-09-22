@@ -139,7 +139,7 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Medium"/>
-                                <Border Background="{StaticResource color3}" CornerRadius="8" Padding="4,1" Margin="5,0,0,0">
+                                <Border Padding="4,1" Margin="5,0,0,0">
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Style.Triggers>
@@ -149,7 +149,7 @@
                                             </Style.Triggers>
                                         </Style>
                                     </Border.Style>
-                                    <TextBlock Text="EXT" FontSize="9" FontWeight="Bold" Foreground="Black"/>
+        
                                 </Border>
                             </StackPanel>
                         </DataTemplate>

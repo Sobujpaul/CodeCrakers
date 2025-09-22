@@ -1,20 +1,20 @@
 ﻿CodeCrakers
-1.0.0.0
+
 
 winexe
 C#
 .cs
-c:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\
 CodeCrakers
 none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
-c:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\App.xaml
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\App.xaml
 12-431405930
 
-39999343153
+371642311717
 213738264465
 MainWindow.xaml;Styles\ButtonStyles.xaml;Styles\UIColors.xaml;Views\DashboardPage.xaml;Views\LeaderboardPage.xaml;Views\LoginPage.xaml;Views\NotificationPage.xaml;Views\PlatformDetailWindow.xaml;Views\PlatformPage.xaml;Views\ProfilePage.xaml;Views\SignUpPage.xaml;Views\UserDetailWindow.xaml;
 
-True
+False
 
