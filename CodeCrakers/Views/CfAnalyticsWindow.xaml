@@ -1,0 +1,65 @@
+<Window x:Class="CodeCrakers.Views.CfAnalyticsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CF Analytics" WindowStartupLocation="CenterOwner" SizeToContent="WidthAndHeight"
+        Background="{StaticResource panelColor}">
+    <Border Padding="20" CornerRadius="10">
+        <StackPanel Width="520">
+            <StackPanel.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="{StaticResource titleColor1}"/>
+                    <Setter Property="FontFamily" Value="Montserrat"/>
+                </Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="{StaticResource panelOverColor}"/>
+                    <Setter Property="CornerRadius" Value="8"/>
+                    <Setter Property="Padding" Value="12"/>
+                    <Setter Property="Margin" Value="0,8,0,0"/>
+                </Style>
+            </StackPanel.Resources>
+
+            <TextBlock x:Name="txtTitle" FontSize="20" FontWeight="SemiBold"/>
+
+            <Border>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Current Rating" Grid.Row="0"/>
+                    <TextBlock x:Name="txtCurrentRating" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right"/>
+
+                    <TextBlock Text="Max Rating" Grid.Row="1"/>
+                    <TextBlock x:Name="txtMaxRating" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right"/>
+
+                    <TextBlock Text="Contests Participated" Grid.Row="2"/>
+                    <TextBlock x:Name="txtContests" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <Border>
+                <StackPanel>
+                    <TextBlock Text="Problems Solved"/>
+                    <TextBlock x:Name="txtProblems" FontSize="16" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Button x:Name="btnOpenProfile" Content="Open on Codeforces" Click="btnOpenProfile_Click"
+                        Background="{StaticResource codeforcesColor}" Foreground="White"
+                        BorderBrush="Transparent" Padding="10,6" Margin="0,0,8,0" Cursor="Hand"/>
+                <Button Content="Close" IsCancel="True"
+                        Background="{StaticResource panelOverColor}" Foreground="{StaticResource titleColor1}"
+                        BorderBrush="{StaticResource color1}" Padding="10,6" Cursor="Hand"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
+
+

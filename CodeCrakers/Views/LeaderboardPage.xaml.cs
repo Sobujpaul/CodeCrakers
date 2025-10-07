@@ -46,6 +46,27 @@ namespace CodeCrakers.Views
         private void btnNext_Click(object sender, RoutedEventArgs e) { currentPage++; LoadLeaderboard(); }
         private void btnPrevious_Click(object sender, RoutedEventArgs e) { if (currentPage > 1) currentPage--; LoadLeaderboard(); }
         private void btnApplyFilters_Click(object sender, RoutedEventArgs e) { currentPage = 1; LoadLeaderboard(); }
+        private void btnRefreshAll_Click(object sender, RoutedEventArgs e)
+        {
+            // Reset placeholders
+            if (string.IsNullOrWhiteSpace(txtSearch.Text) || txtSearch.Text != "Search Name") { txtSearch.Text = "Search Name"; txtSearch.Foreground = System.Windows.Media.Brushes.Gray; }
+            if (string.IsNullOrWhiteSpace(txtCountry.Text) || txtCountry.Text != "Country") { txtCountry.Text = "Country"; txtCountry.Foreground = System.Windows.Media.Brushes.Gray; }
+            if (string.IsNullOrWhiteSpace(txtUniversity.Text) || txtUniversity.Text != "University") { txtUniversity.Text = "University"; txtUniversity.Foreground = System.Windows.Media.Brushes.Gray; }
+
+            // Reset sorting and paging
+            currentPage = 1;
+            foreach (var item in cmbSort.Items)
+            {
+                if (item is ComboBoxItem cbi && (string)cbi.Tag == "rating")
+                {
+                    cbi.IsSelected = true;
+                    break;
+                }
+            }
+
+            // Reload leaderboard
+            LoadLeaderboard();
+        }
 
         private void PlatformButton_Click(object sender, RoutedEventArgs e)
         {
@@ -66,9 +87,27 @@ namespace CodeCrakers.Views
 
             if (!string.IsNullOrEmpty(username))
             {
-                var userType = leaderboardEntry.IsExternal ? "External User" : "Registered User";
-                MessageBox.Show($"Platform: {platform}\nUsername: {username}\nUser: {leaderboardEntry.Name}\nType: {userType}", 
-                    "Platform Details", MessageBoxButton.OK, MessageBoxImage.Information);
+                if (platform.Equals("codeforces", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var analytics = new CfAnalyticsWindow(username, new PlatformApiManager())
+                        {
+                            Owner = Window.GetWindow(this)
+                        };
+                        analytics.ShowDialog();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Unable to open CF Analytics: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                else
+                {
+                    var userType = leaderboardEntry.IsExternal ? "External User" : "Registered User";
+                    MessageBox.Show($"Platform: {platform}\nUsername: {username}\nUser: {leaderboardEntry.Name}\nType: {userType}",
+                        "Platform Details", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
         }
 
@@ -189,6 +228,40 @@ namespace CodeCrakers.Views
                             MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                 }
+            }
+        }
+
+        private void btnEdit_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var entry = button?.DataContext as LeaderboardEntry;
+            if (entry == null || entry.IsExternal == false)
+                return;
+
+            var repo = new ExternalUserRepository();
+            var external = repo.GetById(entry.Id);
+            if (external == null)
+            {
+                MessageBox.Show("External user not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var dlg = new ExternalUserEditWindow(external)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            if (dlg.ShowDialog() == true)
+            {
+                // Prevent duplicate platform usernames
+                if (repo.ExistsWithSamePlatformUsernames(dlg.ExternalUser))
+                {
+                    MessageBox.Show("Another user already uses one of these platform usernames.", "Conflict", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                repo.Update(dlg.ExternalUser);
+                LoadLeaderboard();
+                MessageBox.Show("User updated successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 

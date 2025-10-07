@@ -110,10 +110,20 @@
                                     FontFamily="Montserrat"
                                     FontSize="12"
                                     Foreground="White"
-                                    Background="{StaticResource color1}"
+                                    Background="Orange"
                                     BorderThickness="0"
                                     Margin="10,0,0,0"
-                                    Click="btnTestCodeforces_Click">
+                                    Click="btnTestCodeforces_Click"
+                                    Cursor="Hand">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#FF8C00"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
                                         <Border CornerRadius="5" 
@@ -182,10 +192,20 @@
                                     FontFamily="Montserrat"
                                     FontSize="12"
                                     Foreground="White"
-                                    Background="{StaticResource color2}"
+                                    Background="Orange"
                                     BorderThickness="0"
                                     Margin="10,0,0,0"
-                                    Click="btnTestLeetCode_Click">
+                                    Click="btnTestLeetCode_Click"
+                                    Cursor="Hand">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#FF8C00"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
                                         <Border CornerRadius="5" 
@@ -254,10 +274,20 @@
                                     FontFamily="Montserrat"
                                     FontSize="12"
                                     Foreground="White"
-                                    Background="{StaticResource color3}"
+                                    Background="Orange"
                                     BorderThickness="0"
                                     Margin="10,0,0,0"
-                                    Click="btnTestCodeChef_Click">
+                                    Click="btnTestCodeChef_Click"
+                                    Cursor="Hand">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#FF8C00"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
                                         <Border CornerRadius="5" 
@@ -326,10 +356,20 @@
                                     FontFamily="Montserrat"
                                     FontSize="12"
                                     Foreground="White"
-                                    Background="{StaticResource color4}"
+                                    Background="Orange"
                                     BorderThickness="0"
                                     Margin="10,0,0,0"
-                                    Click="btnTestAtCoder_Click">
+                                    Click="btnTestAtCoder_Click"
+                                    Cursor="Hand">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#FF8C00"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
                                         <Border CornerRadius="5" 
@@ -353,10 +393,20 @@
                         FontSize="14"
                         FontWeight="Medium"
                         Foreground="White"
-                        Background="{StaticResource color5}"
+                        Background="DarkBlue"
                         BorderThickness="0"
                         HorizontalAlignment="Center"
-                        Click="btnSaveSettings_Click">
+                        Click="btnSaveSettings_Click"
+                        Cursor="Hand">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#2563EB"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border CornerRadius="8" 
