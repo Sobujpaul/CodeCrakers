@@ -12,20 +12,20 @@ namespace CodeCrakers.Models
 
     public class CodeforcesUser
     {
-        public string Handle { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Country { get; set; }
-        public string City { get; set; }
-        public string Organization { get; set; }
+        public string Handle { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+        public string Organization { get; set; } = string.Empty;
         public int Rating { get; set; }
         public int MaxRating { get; set; }
-        public string Rank { get; set; }
-        public string MaxRank { get; set; }
+    public string Rank { get; set; } = string.Empty;
+    public string MaxRank { get; set; } = string.Empty;
         public long RegistrationTimeSeconds { get; set; }
         public long LastOnlineTimeSeconds { get; set; }
         public int FriendOfCount { get; set; }
-        public string TitlePhoto { get; set; }
+    public string TitlePhoto { get; set; } = string.Empty;
         public int Contribution { get; set; }
         public int ContestCount { get; set; } // This field exists in the API
     }
@@ -55,7 +55,7 @@ namespace CodeCrakers.Models
     public class CodeforcesRatingChangeEntry
     {
         public int ContestId { get; set; }
-        public string ContestName { get; set; }
+        public string ContestName { get; set; } = string.Empty;
         public int Handle { get; set; }
         public int Rank { get; set; }
         public long RatingUpdateTimeSeconds { get; set; }
@@ -72,9 +72,9 @@ namespace CodeCrakers.Models
     public class CodeforcesContest
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Type { get; set; }
-        public string Phase { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public string Phase { get; set; } = string.Empty;
         public bool Frozen { get; set; }
         public long DurationSeconds { get; set; }
         public long StartTimeSeconds { get; set; }
@@ -84,60 +84,60 @@ namespace CodeCrakers.Models
     public class Problem
     {
         public int ContestId { get; set; }
-        public string Index { get; set; }
-        public string Name { get; set; }
-        public string Type { get; set; }
+        public string Index { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
         public double? Rating { get; set; }
-        public List<string> Tags { get; set; }
+        public List<string> Tags { get; set; } = new();
     }
 
     // LeetCode API Models (using GraphQL-like structure)
     public class LeetCodeUserInfo
     {
-        public LeetCodeData Data { get; set; }
+        public LeetCodeData Data { get; set; } = new();
     }
 
     public class LeetCodeData
     {
-        public LeetCodeUser User { get; set; }
+        public LeetCodeUser User { get; set; } = new();
     }
 
     public class LeetCodeUser
     {
-        public LeetCodeUserProfile Profile { get; set; }
-        public LeetCodeSubmissionStats SubmissionStats { get; set; }
+        public LeetCodeUserProfile Profile { get; set; } = new();
+        public LeetCodeSubmissionStats SubmissionStats { get; set; } = new();
     }
 
     public class LeetCodeUserProfile
     {
-        public string UserName { get; set; }
-        public string RealName { get; set; }
-        public string AboutMe { get; set; }
-        public string Location { get; set; }
-        public string WebsiteUrl { get; set; }
-        public string School { get; set; }
-        public string Company { get; set; }
-        public string JobTitle { get; set; }
-        public string SkillTags { get; set; }
-        public string PostViewCount { get; set; }
-        public string PostViewCountDiff { get; set; }
-        public string Reputation { get; set; }
-        public string ReputationDiff { get; set; }
-        public string SolutionCount { get; set; }
-        public string SolutionCountDiff { get; set; }
-        public string CategoryDiscussCount { get; set; }
-        public string CategoryDiscussCountDiff { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        public string RealName { get; set; } = string.Empty;
+        public string AboutMe { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+        public string WebsiteUrl { get; set; } = string.Empty;
+        public string School { get; set; } = string.Empty;
+        public string Company { get; set; } = string.Empty;
+        public string JobTitle { get; set; } = string.Empty;
+        public string SkillTags { get; set; } = string.Empty;
+        public string PostViewCount { get; set; } = string.Empty;
+        public string PostViewCountDiff { get; set; } = string.Empty;
+        public string Reputation { get; set; } = string.Empty;
+        public string ReputationDiff { get; set; } = string.Empty;
+        public string SolutionCount { get; set; } = string.Empty;
+        public string SolutionCountDiff { get; set; } = string.Empty;
+        public string CategoryDiscussCount { get; set; } = string.Empty;
+        public string CategoryDiscussCountDiff { get; set; } = string.Empty;
     }
 
     public class LeetCodeSubmissionStats
     {
-        public List<LeetCodeSubmissionStat> AcSubmissionNum { get; set; }
-        public List<LeetCodeSubmissionStat> TotalSubmissionNum { get; set; }
+        public List<LeetCodeSubmissionStat> AcSubmissionNum { get; set; } = new();
+        public List<LeetCodeSubmissionStat> TotalSubmissionNum { get; set; } = new();
     }
 
     public class LeetCodeSubmissionStat
     {
-        public string Difficulty { get; set; }
+        public string Difficulty { get; set; } = string.Empty;
         public int Count { get; set; }
         public int Submissions { get; set; }
     }
@@ -145,18 +145,18 @@ namespace CodeCrakers.Models
     // CodeChef API Models (using web scraping approach)
     public class CodeChefUserInfo
     {
-        public string Username { get; set; }
-        public string Name { get; set; }
-        public string Country { get; set; }
-        public string State { get; set; }
-        public string City { get; set; }
-        public string StudentProfessional { get; set; }
-        public string Institution { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
+        public string State { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+        public string StudentProfessional { get; set; } = string.Empty;
+        public string Institution { get; set; } = string.Empty;
         public int Rating { get; set; }
         public int MaxRating { get; set; }
-        public string GlobalRank { get; set; }
-        public string CountryRank { get; set; }
-        public string RatingDiv { get; set; }
+        public string GlobalRank { get; set; } = string.Empty;
+        public string CountryRank { get; set; } = string.Empty;
+        public string RatingDiv { get; set; } = string.Empty;
         public int ProblemsSolved { get; set; }
         public int ProblemsPartiallySolved { get; set; }
     }
@@ -164,24 +164,24 @@ namespace CodeCrakers.Models
     // AtCoder API Models
     public class AtCoderUserInfo
     {
-        public string UserScreenName { get; set; }
-        public string Rating { get; set; }
-        public string HighestRating { get; set; }
-        public string RatedMatches { get; set; }
-        public string LastCompeted { get; set; }
-        public string Affiliation { get; set; }
-        public string Country { get; set; }
-        public string BirthYear { get; set; }
-        public string TwitterId { get; set; }
-        public string TopCoderId { get; set; }
-        public string CodeforcesId { get; set; }
+        public string UserScreenName { get; set; } = string.Empty;
+        public string Rating { get; set; } = string.Empty;
+        public string HighestRating { get; set; } = string.Empty;
+        public string RatedMatches { get; set; } = string.Empty;
+        public string LastCompeted { get; set; } = string.Empty;
+        public string Affiliation { get; set; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
+        public string BirthYear { get; set; } = string.Empty;
+        public string TwitterId { get; set; } = string.Empty;
+        public string TopCoderId { get; set; } = string.Empty;
+        public string CodeforcesId { get; set; } = string.Empty;
     }
 
     // Common models for statistics
     public class PlatformStats
     {
-        public string Platform { get; set; }
-        public string Username { get; set; }
+        public string Platform { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
         public int Rating { get; set; }
         public int MaxRating { get; set; }
         public int ProblemsSolved { get; set; }
@@ -194,21 +194,20 @@ namespace CodeCrakers.Models
     {
         public int UserId { get; set; }
         public int Rank { get; set; }
-        public string DisplayName { get; set; }
-        public string Country { get; set; }
-        public string University { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
+        public string University { get; set; } = string.Empty;
         public bool IsHidden { get; set; }
-
-        public string Codeforces { get; set; }
-        public string LeetCode { get; set; }
-        public string Codechef { get; set; }
-        public string Atcoder { get; set; }
+        public string Codeforces { get; set; } = string.Empty;
+        public string LeetCode { get; set; } = string.Empty;
+        public string Codechef { get; set; } = string.Empty;
+        public string Atcoder { get; set; } = string.Empty;
 
         // Per-platform stats (optional if not connected)
-        public PlatformStats CodeforcesStats { get; set; }
-        public PlatformStats LeetCodeStats { get; set; }
-        public PlatformStats CodechefStats { get; set; }
-        public PlatformStats AtcoderStats { get; set; }
+    public PlatformStats CodeforcesStats { get; set; } = new();
+    public PlatformStats LeetCodeStats { get; set; } = new();
+    public PlatformStats CodechefStats { get; set; } = new();
+    public PlatformStats AtcoderStats { get; set; } = new();
 
         // Derived
         public int TotalProblemsSolved { get; set; }
@@ -227,7 +226,7 @@ namespace CodeCrakers.Models
     // Detailed Analytics Models
     public class DetailedCodeforcesAnalytics
     {
-        public CodeforcesUser UserInfo { get; set; }
+        public CodeforcesUser UserInfo { get; set; } = new();
         public int TotalSubmissions { get; set; }
         public int SolvedProblems { get; set; }
         public int ContestsParticipated { get; set; }
@@ -244,18 +243,18 @@ namespace CodeCrakers.Models
 
     public class RecentSubmission
     {
-        public string ProblemName { get; set; }
-        public string ProblemIndex { get; set; }
+        public string ProblemName { get; set; } = string.Empty;
+        public string ProblemIndex { get; set; } = string.Empty;
         public double? ProblemRating { get; set; }
-        public string Verdict { get; set; }
-        public string Language { get; set; }
+        public string Verdict { get; set; } = string.Empty;
+        public string Language { get; set; } = string.Empty;
         public DateTime SubmissionTime { get; set; }
         public int ContestId { get; set; }
     }
 
     public class RatingChange
     {
-        public string ContestName { get; set; }
+        public string ContestName { get; set; } = string.Empty;
         public int Rank { get; set; }
         public int OldRating { get; set; }
         public int NewRating { get; set; }

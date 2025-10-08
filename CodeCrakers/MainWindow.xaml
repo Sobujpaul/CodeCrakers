@@ -112,6 +112,14 @@
                             </StackPanel>
 
                         </RadioButton>
+                        <RadioButton  Style="{StaticResource menuButton}"
+                                      Tag="{StaticResource color6}"
+                                      Click="OnCompareClick">
+                            <StackPanel Orientation="Horizontal">
+                                <fa:IconImage Icon="ArrowsLeftRight" Style="{StaticResource menuButtonIcon}"/>
+                                <TextBlock Text="Compare" Style="{StaticResource menuButtonText}"/>
+                            </StackPanel>
+                        </RadioButton>
                     </StackPanel>
                     
                     <!-- Profile Section -->

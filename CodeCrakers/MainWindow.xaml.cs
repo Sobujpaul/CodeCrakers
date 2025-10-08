@@ -186,6 +186,13 @@ namespace CodeCrakers
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
+        public void OnCompareClick(object sender, RoutedEventArgs e)
+        {
+            // Placeholder: implement compare page navigation when ComparePage is created
+            MessageBox.Show("Compare feature coming soon!", "Feature Preview", 
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         private void ProfileSection_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             NavigateToProfile();

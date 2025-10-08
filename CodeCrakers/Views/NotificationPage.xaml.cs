@@ -470,9 +470,9 @@ namespace CodeCrakers.Views
     // Data models
     public class ContestNotification
     {
-        public string Id { get; set; }
-        public string Title { get; set; }
-        public string Message { get; set; }
+        public string Id { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
         public DateTimeOffset Timestamp { get; set; }
         public bool IsRead { get; set; }
         public NotificationType Type { get; set; }
@@ -492,14 +492,14 @@ namespace CodeCrakers.Views
         [JsonProperty("id")]
         public int Id { get; set; }
 
-        [JsonProperty("name")]
-        public string Name { get; set; }
+    [JsonProperty("name")]
+    public string Name { get; set; } = string.Empty;
 
-        [JsonProperty("type")]
-        public string Type { get; set; }
+    [JsonProperty("type")]
+    public string Type { get; set; } = string.Empty;
 
-        [JsonProperty("phase")]
-        public string Phase { get; set; }
+    [JsonProperty("phase")]
+    public string Phase { get; set; } = string.Empty;
 
         [JsonProperty("frozen")]
         public bool Frozen { get; set; }
@@ -517,9 +517,9 @@ namespace CodeCrakers.Views
     public class CodeforcesApiResponse<T>
     {
         [JsonProperty("status")]
-        public string Status { get; set; }
+        public string Status { get; set; } = string.Empty;
 
         [JsonProperty("result")]
-        public T Result { get; set; }
+        public T Result { get; set; } = default!;
     }
 }

@@ -5,8 +5,8 @@ namespace CodeCrakers.Models
     public class Contest
     {
         public int Id { get; set; }                    // Primary Key
-        public string Name { get; set; }               // Contest name
-        public string Platform { get; set; }          // Platform (Codeforces, AtCoder, etc.)
+        public string Name { get; set; } = string.Empty;               // Contest name
+        public string Platform { get; set; } = string.Empty;          // Platform (Codeforces, AtCoder, etc.)
         public DateTime StartTime { get; set; }       // Contest start time (UTC)
         public int DurationSeconds { get; set; }      // Contest duration in seconds
         public string? Url { get; set; }              // Contest URL

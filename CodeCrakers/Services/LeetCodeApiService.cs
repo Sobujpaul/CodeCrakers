@@ -49,7 +49,7 @@ namespace CodeCrakers.Services
             }
         }
 
-        private async Task<LeetCodeUser> TryGetUserInfoFromProfilePage(string username)
+    private async Task<LeetCodeUser?> TryGetUserInfoFromProfilePage(string username)
         {
             try
             {
@@ -133,7 +133,7 @@ namespace CodeCrakers.Services
                     return userInfo;
                 }
 
-                return null;
+                return null; // explicit
             }
             catch (Exception ex)
             {
@@ -142,7 +142,7 @@ namespace CodeCrakers.Services
             }
         }
 
-        private async Task<LeetCodeUser> TryGetUserInfoFromStats(string username)
+    private async Task<LeetCodeUser?> TryGetUserInfoFromStats(string username)
         {
             try
             {
@@ -195,7 +195,7 @@ namespace CodeCrakers.Services
                     }
                 }
 
-                return null;
+                return null; // explicit fallback
             }
             catch (Exception ex)
             {
