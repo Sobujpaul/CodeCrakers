@@ -191,3 +191,9 @@ C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-wi
 C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\ExternalUserEditWindow.g.cs
 C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\CfAnalyticsWindow.baml
 C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\CfAnalyticsWindow.g.cs
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\ResetPasswordWindow.baml
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\ResetPasswordWindow.g.cs
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\EnterResetCodeWindow.baml
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\SetNewPasswordWindow.baml
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\EnterResetCodeWindow.g.cs
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\SetNewPasswordWindow.g.cs

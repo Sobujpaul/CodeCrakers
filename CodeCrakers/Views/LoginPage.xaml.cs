@@ -105,42 +105,57 @@ namespace CodeCrakers.Views
         {
             try
             {
-                // Ask user for their email
-                var email = Microsoft.VisualBasic.Interaction.InputBox("Enter your registered email to receive a reset token:", "Forgot Password", "");
-                if (string.IsNullOrWhiteSpace(email)) return;
+                // 1. Ask for email
+                var email = Microsoft.VisualBasic.Interaction.InputBox("Enter your registered email to receive a verification code:", "Forgot Password", "");
+                if (string.IsNullOrWhiteSpace(email)) return; // cancelled
 
-                // Find user by email
-                int? userId = null;
+                int? userId = null; string? username = null;
                 using (var con = AppDb.GetConnection())
                 {
                     con.Open();
                     using var cmd = con.CreateCommand();
-                    cmd.CommandText = "SELECT Id FROM Users WHERE Email=@e LIMIT 1;";
+                    cmd.CommandText = "SELECT Id, Username FROM Users WHERE Email=@e LIMIT 1;";
                     cmd.Parameters.AddWithValue("@e", email.Trim());
-                    var result = cmd.ExecuteScalar();
-                    if (result != null) userId = System.Convert.ToInt32(result);
+                    using var reader = cmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        userId = reader.GetInt32(0);
+                        username = reader.GetString(1);
+                    }
                 }
-
                 if (!userId.HasValue)
                 {
                     MessageBox.Show("No account found with that email.", "Not Found", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                // Create token
+                // 2. Create one-time code (token) and send
                 var resetRepo = new PasswordResetRepository();
-                var token = resetRepo.CreateResetToken(userId.Value);
-
-                // Send token via email service (stub logs to debug)
+                var token = resetRepo.CreateResetToken(userId.Value, TimeSpan.FromMinutes(10));
                 var emailService = new EmailService();
                 emailService.SendPasswordResetEmail(email.Trim(), token);
+                MessageBox.Show("A verification code has been sent to your email (check debug log).", "Code Sent", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                MessageBox.Show("A reset token has been generated and (simulated) sent to your email.\nCheck debug output.", "Token Sent", MessageBoxButton.OK, MessageBoxImage.Information);
+                // 3. Prompt user to enter code
+                var enterCode = new EnterResetCodeWindow { Owner = this };
+                if (enterCode.ShowDialog() != true) return; // user cancelled
+                var entered = enterCode.EnteredCode?.Trim();
+                if (string.IsNullOrWhiteSpace(entered)) return;
 
-                // Open reset window
-                var resetWindow = new ResetPasswordWindow();
-                resetWindow.Owner = this;
-                resetWindow.ShowDialog();
+                var validatedUserId = resetRepo.ValidateToken(entered);
+                if (!validatedUserId.HasValue || validatedUserId.Value != userId.Value)
+                {
+                    MessageBox.Show("Invalid or expired code.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                // 4. Open window to set new password (username + new password)
+                var setPassWindow = new SetNewPasswordWindow(userId.Value, username) { Owner = this };
+                if (setPassWindow.ShowDialog() == true)
+                {
+                    // Mark token used
+                    resetRepo.MarkTokenUsed(entered!);
+                }
             }
             catch (System.Exception ex)
             {
