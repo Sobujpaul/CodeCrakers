@@ -197,3 +197,7 @@ C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-wi
 C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\SetNewPasswordWindow.baml
 C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\EnterResetCodeWindow.g.cs
 C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\SetNewPasswordWindow.g.cs
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\ComparePage.baml
+C:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\ComparePage.g.cs
+c:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\CompareResultPage.baml
+c:\Users\hp\OneDrive\Desktop\project\CodeCrakers\CodeCrakers\obj\Debug\net8.0-windows\Views\CompareResultPage.g.cs

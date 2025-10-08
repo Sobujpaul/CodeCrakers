@@ -261,4 +261,12 @@ namespace CodeCrakers.Models
         public int RatingChangeValue { get; set; }
         public DateTime ContestTime { get; set; }
     }
+
+    public class AttemptMetrics
+    {
+        public double AverageAttempts { get; set; }
+        public int MaxAttempts { get; set; }
+        public double OneShotPercentage { get; set; }
+        public int SolvedProblems { get; set; }
+    }
 }

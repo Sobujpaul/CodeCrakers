@@ -11,11 +11,14 @@ namespace CodeCrakers
     public partial class MainWindow : Window
     {
         private int _userId; // logged-in user ID
-        private UserProfileRepository _profileRepo;
-        private DashboardPage _dashboardPage;
-        private PlatformPage _platformPage;
-        private LeaderboardPage _leaderboardPage;
-        private ProfilePage _profilePage;
+    private UserProfileRepository? _profileRepo;
+    private DashboardPage? _dashboardPage;
+    private PlatformPage? _platformPage;
+    private LeaderboardPage? _leaderboardPage;
+    private ProfilePage? _profilePage;
+    private ComparePage? _comparePage;
+    private CompareResultPage? _compareResultPage;
+    private NotificationPage? _notificationPage;
 
         public MainWindow(int userId) // receive userId from LoginPage
         {
@@ -47,6 +50,8 @@ namespace CodeCrakers
                 System.Diagnostics.Debug.WriteLine("MainWindow: Creating ProfilePage...");
                 _profilePage = new ProfilePage(_userId);
                 System.Diagnostics.Debug.WriteLine("MainWindow: ProfilePage created");
+
+                System.Diagnostics.Debug.WriteLine("MainWindow: ComparePage will be created on first use (lazy).");
                 
                 // Set up event handlers
                 _platformPage.OnSettingsSaved = RefreshDashboard;
@@ -138,10 +143,74 @@ namespace CodeCrakers
             txtPageTitle.Text = "Profile Settings";
         }
 
+        private void NavigateToCompare()
+        {
+            try
+            {
+                if (_comparePage == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("MainWindow: Instantiating ComparePage now...");
+                    _comparePage = new ComparePage();
+                    _comparePage.OnCompareRequested += NavigateToCompareResult; // hook event
+                }
+                contentArea.Content = _comparePage;
+                txtPageTitle.Text = "Compare Users";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to open Compare page: {ex.Message}", "Compare Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Diagnostics.Debug.WriteLine($"Compare navigation error: {ex}");
+            }
+        }
+
+        private void NavigateToCompareResult(string handle1, string handle2)
+        {
+            try
+            {
+                if (string.Equals(handle1, handle2, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    MessageBox.Show("Please enter two different handles to compare.", "Compare", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+                System.Diagnostics.Debug.WriteLine($"MainWindow: Navigating to CompareResult for {handle1} vs {handle2}");
+                _compareResultPage = new CompareResultPage(handle1, handle2);
+                _compareResultPage.OnBackRequested += () =>
+                {
+                    NavigateToCompare();
+                };
+                contentArea.Content = _compareResultPage;
+                txtPageTitle.Text = "Comparison Results";
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Failed to load comparison results: {ex.Message}", "Compare Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Diagnostics.Debug.WriteLine($"CompareResult navigation error: {ex}");
+            }
+        }
+
+        private void NavigateToNotification()
+        {
+            try
+            {
+                if (_notificationPage == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("MainWindow: Instantiating NotificationPage now...");
+                    _notificationPage = new NotificationPage();
+                }
+                contentArea.Content = _notificationPage;
+                txtPageTitle.Text = "Notifications";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to open Notifications page: {ex.Message}", "Notification Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Diagnostics.Debug.WriteLine($"Notification navigation error: {ex}");
+            }
+        }
+
         private void RefreshDashboard()
         {
             // Always refresh the dashboard data, regardless of current view
-            _dashboardPage.RefreshData();
+            _dashboardPage?.RefreshData();
             
             // If dashboard is currently visible, it will show the updated data immediately
             // If not, the data will be fresh when user navigates back to dashboard
@@ -167,16 +236,7 @@ namespace CodeCrakers
 
         public void OnNotificationClick(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var page = new CodeCrakers.Views.NotificationPage();
-                contentArea.Content = page;
-                txtPageTitle.Text = "Notifications";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error opening notifications: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            NavigateToNotification();
         }
 
         public void OnSuggestionClick(object sender, RoutedEventArgs e)
@@ -188,9 +248,7 @@ namespace CodeCrakers
 
         public void OnCompareClick(object sender, RoutedEventArgs e)
         {
-            // Placeholder: implement compare page navigation when ComparePage is created
-            MessageBox.Show("Compare feature coming soon!", "Feature Preview", 
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            NavigateToCompare();
         }
 
         private void ProfileSection_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -286,5 +286,56 @@ namespace CodeCrakers.Services
                 return new List<RatingChange>();
             }
         }
+
+        public async Task<AttemptMetrics> GetAttemptMetricsAsync(string username)
+        {
+            try
+            {
+                var submissions = await GetAllUserSubmissionsAsync(username, 1000);
+                var problemGroups = submissions
+                    .Where(s => s.Problem != null)
+                    .GroupBy(s => s.Problem!.ContestId + "-" + s.Problem!.Index);
+
+                int solved = 0;
+                int totalAttemptsSum = 0;
+                int maxAttempts = 0;
+                int oneShot = 0;
+
+                foreach (var g in problemGroups)
+                {
+                    var ordered = g.OrderBy(s => s.CreationTimeSeconds).ToList();
+                    int attemptCount = 0;
+                    foreach (var sub in ordered)
+                    {
+                        attemptCount++;
+                        if (sub.Verdict == "OK")
+                        {
+                            solved++;
+                            totalAttemptsSum += attemptCount;
+                            if (attemptCount > maxAttempts) maxAttempts = attemptCount;
+                            if (attemptCount == 1) oneShot++;
+                            break;
+                        }
+                    }
+                }
+
+                if (solved == 0)
+                {
+                    return new AttemptMetrics();
+                }
+
+                return new AttemptMetrics
+                {
+                    AverageAttempts = (double)totalAttemptsSum / solved,
+                    MaxAttempts = maxAttempts,
+                    OneShotPercentage = (double)oneShot / solved * 100.0,
+                    SolvedProblems = solved
+                };
+            }
+            catch (ApiException)
+            {
+                return new AttemptMetrics();
+            }
+        }
     }
 }
