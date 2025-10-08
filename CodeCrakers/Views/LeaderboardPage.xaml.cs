@@ -21,7 +21,7 @@ namespace CodeCrakers.Views
             LoadLeaderboard();
         }
 
-        public void LoadLeaderboard()
+        public async void LoadLeaderboard()
         {
             var sortBy = ((ComboBoxItem)cmbSort.SelectedItem)?.Tag?.ToString() ?? "currentRating";
 
@@ -30,17 +30,29 @@ namespace CodeCrakers.Views
             var countryText = (txtCountry.Text == "Country") ? "" : txtCountry.Text;
             var universityText = (txtUniversity.Text == "University") ? "" : txtUniversity.Text;
 
-            var leaderboard = _leaderboardService.GetLeaderboard(
-                currentPage,
-                pageSize,
-                searchText,
-                countryText,
-                universityText,
-                sortBy
-            );
+            try
+            {
+                // Show loading indication
+                txtPageInfo.Text = "Loading live data...";
+                
+                // Use live API data for accurate stats
+                var leaderboard = await _leaderboardService.GetLeaderboardWithLiveDataAsync(
+                    currentPage,
+                    pageSize,
+                    searchText,
+                    countryText,
+                    universityText,
+                    sortBy
+                );
 
-            dgLeaderboard.ItemsSource = leaderboard;
-            txtPageInfo.Text = $"Page {currentPage}";
+                dgLeaderboard.ItemsSource = leaderboard;
+                txtPageInfo.Text = $"Page {currentPage}";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading leaderboard: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtPageInfo.Text = "Error loading data";
+            }
         }
 
         private void btnNext_Click(object sender, RoutedEventArgs e) { currentPage++; LoadLeaderboard(); }

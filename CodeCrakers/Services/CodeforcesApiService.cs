@@ -34,29 +34,51 @@ namespace CodeCrakers.Services
             return response.Result ?? new List<CodeforcesSubmission>();
         }
 
+        // Fetch all submissions with pagination to avoid truncation (fix for leaderboard incorrect solved count)
+        private async Task<List<CodeforcesSubmission>> GetAllUserSubmissionsAsync(string username, int batchSize = 1000, int hardLimit = 200000)
+        {
+            var all = new List<CodeforcesSubmission>();
+            int from = 1;
+
+            while (from <= hardLimit)
+            {
+                var batch = await GetUserSubmissionsAsync(username, from, batchSize);
+                if (batch.Count == 0)
+                    break;
+
+                all.AddRange(batch);
+
+                // If fewer than batchSize returned, we've reached the end
+                if (batch.Count < batchSize)
+                    break;
+
+                from += batchSize;
+            }
+
+            return all;
+        }
+
         public async Task<PlatformStats> GetUserStatsAsync(string username)
         {
             try
             {
                 var userInfo = await GetUserInfoAsync(username);
-                var submissions = await GetUserSubmissionsAsync(username, 1, 1000);
+                // Use full (paginated) submission history instead of only first 1000 to ensure accurate solved count
+                var submissions = await GetAllUserSubmissionsAsync(username);
 
-                // Calculate problems solved (AC submissions)
                 var solvedProblems = submissions
-                    .Where(s => s.Verdict == "OK")
-                    .Select(s => $"{s.Problem.ContestId}{s.Problem.Index}")
+                    .Where(s => s.Verdict == "OK" && s.Problem != null)
+                    .Select(s => $"{s.Problem!.ContestId}-{s.Problem.Index}")
                     .Distinct()
                     .Count();
 
-                // Calculate contests participated
                 var contestsParticipated = submissions
                     .Where(s => s.ContestId > 0)
                     .Select(s => s.ContestId)
                     .Distinct()
                     .Count();
 
-                // Get last activity
-                var lastActivity = submissions.Any() 
+                var lastActivity = submissions.Any()
                     ? DateTimeOffset.FromUnixTimeSeconds(submissions.Max(s => s.CreationTimeSeconds)).DateTime
                     : DateTimeOffset.FromUnixTimeSeconds(userInfo.LastOnlineTimeSeconds).DateTime;
 
@@ -74,12 +96,7 @@ namespace CodeCrakers.Services
             }
             catch (ApiException)
             {
-                return new PlatformStats
-                {
-                    Platform = "Codeforces",
-                    Username = username,
-                    IsConnected = false
-                };
+                return new PlatformStats { Platform = "Codeforces", Username = username, IsConnected = false };
             }
         }
 
@@ -97,12 +114,12 @@ namespace CodeCrakers.Services
 
                 // Calculate problems solved this week
                 var problemsSolved = weeklySubmissions
-                    .Where(s => s.Verdict == "OK")
-                    .Select(s => $"{s.Problem.ContestId}{s.Problem.Index}")
+                    .Where(s => s.Verdict == "OK" && s.Problem != null)
+                    .Select(s => $"{s.Problem!.ContestId}-{s.Problem.Index}")
                     .Distinct()
                     .Count();
 
-                // Calculate contests participated this week
+                // Calculate contests participated this week (only actual contests)
                 var contestsParticipated = weeklySubmissions
                     .Where(s => s.ContestId > 0)
                     .Select(s => s.ContestId)
@@ -149,7 +166,8 @@ namespace CodeCrakers.Services
             try
             {
                 var userInfo = await GetUserInfoAsync(username);
-                var submissions = await GetUserSubmissionsAsync(username, 1, 100000); // Get all submissions for all-time analysis
+                // Reuse the same pagination logic to avoid relying on an oversized single request
+                var submissions = await GetAllUserSubmissionsAsync(username, 1000); // full analytics always gets all
                 
                 var analytics = new DetailedCodeforcesAnalytics
                 {
@@ -166,16 +184,16 @@ namespace CodeCrakers.Services
                     .ToDictionary(g => g.Key, g => g.Count());
 
                 // Calculate accepted problems
-                var acceptedSubmissions = submissions.Where(s => s.Verdict == "OK").ToList();
+                var acceptedSubmissions = submissions.Where(s => s.Verdict == "OK" && s.Problem != null).ToList();
                 analytics.SolvedProblems = acceptedSubmissions
-                    .Select(s => $"{s.Problem.ContestId}{s.Problem.Index}")
+                    .Select(s => $"{s.Problem!.ContestId}-{s.Problem.Index}")
                     .Distinct()
                     .Count();
 
                 // Calculate problem difficulty distribution
                 var problemsWithRating = acceptedSubmissions
-                    .Where(s => s.Problem.Rating.HasValue)
-                    .Select(s => s.Problem.Rating.Value)
+                    .Where(s => s.Problem!.Rating.HasValue)
+                    .Select(s => s.Problem!.Rating!.Value)
                     .ToList();
 
                 analytics.DifficultyDistribution = problemsWithRating
@@ -184,8 +202,8 @@ namespace CodeCrakers.Services
 
                 // Calculate problem tags statistics
                 var allTags = acceptedSubmissions
-                    .Where(s => s.Problem.Tags != null)
-                    .SelectMany(s => s.Problem.Tags)
+                    .Where(s => s.Problem!.Tags != null)
+                    .SelectMany(s => s.Problem!.Tags!)
                     .ToList();
 
                 analytics.TopProblemTags = allTags
@@ -197,12 +215,12 @@ namespace CodeCrakers.Services
                 // Calculate programming languages
                 analytics.LanguageStats = submissions
                     .Where(s => !string.IsNullOrEmpty(s.ProgrammingLanguage))
-                    .GroupBy(s => s.ProgrammingLanguage)
+                    .GroupBy(s => s.ProgrammingLanguage!)
                     .OrderByDescending(g => g.Count())
                     .Take(10)
                     .ToDictionary(g => g.Key, g => g.Count());
 
-                // Calculate contests participated
+                // Calculate contests participated (from unique contest IDs)
                 analytics.ContestsParticipated = submissions
                     .Where(s => s.ContestId > 0)
                     .Select(s => s.ContestId)
@@ -236,7 +254,7 @@ namespace CodeCrakers.Services
             }
             catch (ApiException)
             {
-                return null;
+                return null!; // Caller handles null (analytics window checks and shows error state)
             }
         }
 

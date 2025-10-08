@@ -105,6 +105,21 @@ CREATE TABLE IF NOT EXISTS Notifications(
                 cmd.ExecuteNonQuery();
             }
 
+            // New table for password reset tokens (one-time codes)
+            using (var cmd = con.CreateCommand())
+            {
+                cmd.CommandText = @"CREATE TABLE IF NOT EXISTS PasswordResets(
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserId INTEGER NOT NULL,
+    Token TEXT NOT NULL,
+    ExpiresAt TEXT NOT NULL,
+    Used INTEGER DEFAULT 0,
+    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(UserId) REFERENCES Users(Id) ON DELETE CASCADE
+);";
+                cmd.ExecuteNonQuery();
+            }
+
             // Lightweight migration: add columns if they don't exist yet
             EnsureColumn(con, "UserProfiles", "Country", "TEXT", null);
             EnsureColumn(con, "UserProfiles", "University", "TEXT", null);
@@ -131,7 +146,7 @@ CREATE TABLE IF NOT EXISTS Notifications(
             return new SqliteConnection(ConnectionString);
         }
 
-        private static void EnsureColumn(SqliteConnection connection, string table, string column, string type, string defaultValue)
+        private static void EnsureColumn(SqliteConnection connection, string table, string column, string type, string? defaultValue)
         {
             using var checkCmd = connection.CreateCommand();
             checkCmd.CommandText = $"PRAGMA table_info({table});";
@@ -149,7 +164,7 @@ CREATE TABLE IF NOT EXISTS Notifications(
 
             if (!exists)
             {
-                var defaultClause = defaultValue == null ? string.Empty : $" DEFAULT {defaultValue}";
+                var defaultClause = string.IsNullOrEmpty(defaultValue) ? string.Empty : $" DEFAULT {defaultValue}";
                 using var alterCmd = connection.CreateCommand();
                 alterCmd.CommandText = $"ALTER TABLE {table} ADD COLUMN {column} {type}{defaultClause};";
                 alterCmd.ExecuteNonQuery();

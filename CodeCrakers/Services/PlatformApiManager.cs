@@ -38,7 +38,7 @@ namespace CodeCrakers.Services
                     _ => new PlatformStats { Platform = platform, IsConnected = false }
                 };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new PlatformStats 
                 { 
@@ -118,26 +118,30 @@ namespace CodeCrakers.Services
             var userRepo = new UserRepository();
             var profileRepo = new UserProfileRepository();
             var user = userRepo.GetById(userId);
-            var profile = profileRepo.GetByUserId(userId);
+            var profile = profileRepo.GetByUserId(userId) ?? new UserProfile { UserId = userId };
 
             var aggregated = new AggregatedUserStats
             {
                 UserId = userId,
                 DisplayName = user?.Username ?? $"User {userId}",
-                Country = profile?.Country,
-                University = profile?.University,
-                IsHidden = (profile?.IsHidden ?? 0) == 1,
-                Codeforces = profile?.Codeforces,
-                LeetCode = profile?.LeetCode,
-                Codechef = profile?.Codechef,
-                Atcoder = profile?.Atcoder
+                Country = profile.Country ?? string.Empty,
+                University = profile.University ?? string.Empty,
+                IsHidden = (profile.IsHidden) == 1,
+                Codeforces = profile.Codeforces ?? string.Empty,
+                LeetCode = profile.LeetCode ?? string.Empty,
+                Codechef = profile.Codechef ?? string.Empty,
+                Atcoder = profile.Atcoder ?? string.Empty
             };
 
             var stats = await GetAllPlatformStatsAsync(profile);
-            aggregated.CodeforcesStats = stats.FirstOrDefault(s => s.Platform.Equals("Codeforces", StringComparison.OrdinalIgnoreCase));
-            aggregated.LeetCodeStats = stats.FirstOrDefault(s => s.Platform.Equals("LeetCode", StringComparison.OrdinalIgnoreCase));
-            aggregated.CodechefStats = stats.FirstOrDefault(s => s.Platform.Equals("CodeChef", StringComparison.OrdinalIgnoreCase));
-            aggregated.AtcoderStats = stats.FirstOrDefault(s => s.Platform.Equals("AtCoder", StringComparison.OrdinalIgnoreCase));
+            aggregated.CodeforcesStats = stats.FirstOrDefault(s => s.Platform.Equals("Codeforces", StringComparison.OrdinalIgnoreCase))
+                ?? new PlatformStats { Platform = "Codeforces", Username = aggregated.Codeforces, IsConnected = false };
+            aggregated.LeetCodeStats = stats.FirstOrDefault(s => s.Platform.Equals("LeetCode", StringComparison.OrdinalIgnoreCase))
+                ?? new PlatformStats { Platform = "LeetCode", Username = aggregated.LeetCode, IsConnected = false };
+            aggregated.CodechefStats = stats.FirstOrDefault(s => s.Platform.Equals("CodeChef", StringComparison.OrdinalIgnoreCase))
+                ?? new PlatformStats { Platform = "CodeChef", Username = aggregated.Codechef, IsConnected = false };
+            aggregated.AtcoderStats = stats.FirstOrDefault(s => s.Platform.Equals("AtCoder", StringComparison.OrdinalIgnoreCase))
+                ?? new PlatformStats { Platform = "AtCoder", Username = aggregated.Atcoder, IsConnected = false };
 
             aggregated.TotalProblemsSolved = stats.Sum(s => s?.ProblemsSolved ?? 0);
             aggregated.HighestRating = stats.Any() ? stats.Max(s => s?.Rating ?? 0) : 0;

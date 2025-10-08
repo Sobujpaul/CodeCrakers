@@ -1,5 +1,6 @@
 ﻿using CodeCrakers.Data;
 using CodeCrakers.Views; // ✅ WPF navigation
+using CodeCrakers.Services;
 using System.Windows;
 using System.Windows.Input;
 
@@ -97,6 +98,54 @@ namespace CodeCrakers.Views
             SignUpPage signUp = new SignUpPage();
             signUp.Show();
             this.Close();
+        }
+
+        // Forgot password flow
+        private void ForgotPassword_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                // Ask user for their email
+                var email = Microsoft.VisualBasic.Interaction.InputBox("Enter your registered email to receive a reset token:", "Forgot Password", "");
+                if (string.IsNullOrWhiteSpace(email)) return;
+
+                // Find user by email
+                int? userId = null;
+                using (var con = AppDb.GetConnection())
+                {
+                    con.Open();
+                    using var cmd = con.CreateCommand();
+                    cmd.CommandText = "SELECT Id FROM Users WHERE Email=@e LIMIT 1;";
+                    cmd.Parameters.AddWithValue("@e", email.Trim());
+                    var result = cmd.ExecuteScalar();
+                    if (result != null) userId = System.Convert.ToInt32(result);
+                }
+
+                if (!userId.HasValue)
+                {
+                    MessageBox.Show("No account found with that email.", "Not Found", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Create token
+                var resetRepo = new PasswordResetRepository();
+                var token = resetRepo.CreateResetToken(userId.Value);
+
+                // Send token via email service (stub logs to debug)
+                var emailService = new EmailService();
+                emailService.SendPasswordResetEmail(email.Trim(), token);
+
+                MessageBox.Show("A reset token has been generated and (simulated) sent to your email.\nCheck debug output.", "Token Sent", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                // Open reset window
+                var resetWindow = new ResetPasswordWindow();
+                resetWindow.Owner = this;
+                resetWindow.ShowDialog();
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Error starting password reset: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

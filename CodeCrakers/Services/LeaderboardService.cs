@@ -18,13 +18,12 @@ namespace CodeCrakers.Services
             string searchName = "", string country = "", string university = "",
             string sortBy = "rating")
         {
-            // Get registered users
-            var registeredUsers = _userRepo.GetLeaderboard(searchName, country, university, sortBy, page, pageSize);
-            
-            // Get external users
+            // Fetch all registered users (no pagination) so that sorting is applied globally before slicing
+            var registeredUsers = _userRepo.GetLeaderboardAll(searchName, country, university, sortBy);
+            // External users (all) then filtered
             var externalUsers = _externalRepo.GetAll();
             
-            // Convert registered users to leaderboard entries
+            // Convert registered users to leaderboard entries using cached data (fast loading)
             var registeredEntries = registeredUsers.Select(u => new LeaderboardEntry
             {
                 Id = u.UserId,
@@ -33,7 +32,7 @@ namespace CodeCrakers.Services
                 HasCodeChef = !string.IsNullOrEmpty(u.Codechef),
                 HasLeetCode = !string.IsNullOrEmpty(u.LeetCode),
                 HasAtCoder = !string.IsNullOrEmpty(u.Atcoder),
-                CurrentRating = u.TotalRating, // For now, use TotalRating as current rating
+                CurrentRating = u.TotalRating,
                 MaxRating = u.TotalRating,
                 ProblemsSolved = u.TotalSolved,
                 Country = u.Country,
@@ -45,7 +44,7 @@ namespace CodeCrakers.Services
                 AtCoderUsername = u.Atcoder
             }).ToList();
             
-            // Convert external users to leaderboard entries
+            // Convert external users to leaderboard entries using stored data (fast loading)
             var externalEntries = externalUsers.Where(eu => 
                 (string.IsNullOrEmpty(searchName) || eu.DisplayName.Contains(searchName, StringComparison.OrdinalIgnoreCase)) &&
                 (string.IsNullOrEmpty(country) || (eu.Country?.Contains(country, StringComparison.OrdinalIgnoreCase) ?? false)) &&
@@ -58,7 +57,7 @@ namespace CodeCrakers.Services
                 HasCodeChef = !string.IsNullOrEmpty(eu.Codechef),
                 HasLeetCode = !string.IsNullOrEmpty(eu.LeetCode),
                 HasAtCoder = !string.IsNullOrEmpty(eu.Atcoder),
-                CurrentRating = eu.MaxRating, // For external users, assume max rating is current rating
+                CurrentRating = eu.MaxRating,
                 MaxRating = eu.MaxRating,
                 ProblemsSolved = eu.TotalSolved,
                 Country = eu.Country,
@@ -74,7 +73,7 @@ namespace CodeCrakers.Services
             // Combine all entries
             var allEntries = registeredEntries.Concat(externalEntries).ToList();
             
-            // Sort based on criteria
+            // Global sort applied BEFORE pagination to ensure correctness
             allEntries = sortBy.ToLower() switch
             {
                 "currentrating" => allEntries.OrderByDescending(e => e.CurrentRating).ThenByDescending(e => e.ProblemsSolved).ToList(),
@@ -83,9 +82,188 @@ namespace CodeCrakers.Services
                 "name" => allEntries.OrderBy(e => e.Name).ToList(),
                 _ => allEntries.OrderByDescending(e => e.CurrentRating).ThenByDescending(e => e.ProblemsSolved).ToList()
             };
+
+            var paginatedEntries = allEntries
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
             
-            // Apply pagination and set ranks
-            var paginatedEntries = allEntries.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            for (int i = 0; i < paginatedEntries.Count; i++)
+            {
+                paginatedEntries[i].Rank = (page - 1) * pageSize + i + 1;
+            }
+            
+            return paginatedEntries;
+        }
+        
+        // Async method for refreshing with live API data
+        public async Task<List<LeaderboardEntry>> GetLeaderboardWithLiveDataAsync(
+            int page = 1, int pageSize = 10,
+            string searchName = "", string country = "", string university = "",
+            string sortBy = "rating")
+        {
+            // Fetch all for proper global sorting (sorting inside repository would be overridden anyway)
+            var registeredUsers = _userRepo.GetLeaderboardAll(searchName, country, university, sortBy);
+            var externalUsers = _externalRepo.GetAll();
+            
+            var allEntries = new List<LeaderboardEntry>();
+            
+            // Process registered users with live API data
+            foreach (var u in registeredUsers)
+            {
+                var entry = new LeaderboardEntry
+                {
+                    Id = u.UserId,
+                    Name = u.DisplayName ?? $"User {u.UserId}",
+                    HasCodeforces = !string.IsNullOrEmpty(u.Codeforces),
+                    HasCodeChef = !string.IsNullOrEmpty(u.Codechef),
+                    HasLeetCode = !string.IsNullOrEmpty(u.LeetCode),
+                    HasAtCoder = !string.IsNullOrEmpty(u.Atcoder),
+                    Country = u.Country,
+                    University = u.University,
+                    IsExternal = false,
+                    CodeforcesUsername = u.Codeforces,
+                    LeetCodeUsername = u.LeetCode,
+                    CodeChefUsername = u.Codechef,
+                    AtCoderUsername = u.Atcoder
+                };
+
+                try
+                {
+                    var platformStats = new List<PlatformStats>();
+
+                    if (!string.IsNullOrEmpty(u.Codeforces))
+                    {
+                        var cfStats = await _apiManager.GetPlatformStatsAsync("codeforces", u.Codeforces);
+                        if (cfStats?.IsConnected == true) platformStats.Add(cfStats);
+                    }
+                    if (!string.IsNullOrEmpty(u.LeetCode))
+                    {
+                        var lcStats = await _apiManager.GetPlatformStatsAsync("leetcode", u.LeetCode);
+                        if (lcStats?.IsConnected == true) platformStats.Add(lcStats);
+                    }
+                    if (!string.IsNullOrEmpty(u.Codechef))
+                    {
+                        var ccStats = await _apiManager.GetPlatformStatsAsync("codechef", u.Codechef);
+                        if (ccStats?.IsConnected == true) platformStats.Add(ccStats);
+                    }
+                    if (!string.IsNullOrEmpty(u.Atcoder))
+                    {
+                        var acStats = await _apiManager.GetPlatformStatsAsync("atcoder", u.Atcoder);
+                        if (acStats?.IsConnected == true) platformStats.Add(acStats);
+                    }
+
+                    if (platformStats.Any())
+                    {
+                        entry.CurrentRating = platformStats.Max(s => s.Rating);
+                        entry.MaxRating = platformStats.Max(s => s.MaxRating);
+                        entry.ProblemsSolved = platformStats.Sum(s => s.ProblemsSolved);
+                    }
+                    else
+                    {
+                        entry.CurrentRating = u.TotalRating;
+                        entry.MaxRating = u.TotalRating;
+                        entry.ProblemsSolved = u.TotalSolved;
+                    }
+                }
+                catch
+                {
+                    entry.CurrentRating = u.TotalRating;
+                    entry.MaxRating = u.TotalRating;
+                    entry.ProblemsSolved = u.TotalSolved;
+                }
+
+                allEntries.Add(entry);
+            }
+            
+            // Process external users with live data when possible
+            var filteredExternalUsers = externalUsers.Where(eu => 
+                (string.IsNullOrEmpty(searchName) || eu.DisplayName.Contains(searchName, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrEmpty(country) || (eu.Country?.Contains(country, StringComparison.OrdinalIgnoreCase) ?? false)) &&
+                (string.IsNullOrEmpty(university) || (eu.University?.Contains(university, StringComparison.OrdinalIgnoreCase) ?? false))
+            ).ToList();
+            
+            foreach (var eu in filteredExternalUsers)
+            {
+                var entry = new LeaderboardEntry
+                {
+                    Id = eu.Id,
+                    Name = eu.DisplayName,
+                    HasCodeforces = !string.IsNullOrEmpty(eu.Codeforces),
+                    HasCodeChef = !string.IsNullOrEmpty(eu.Codechef),
+                    HasLeetCode = !string.IsNullOrEmpty(eu.LeetCode),
+                    HasAtCoder = !string.IsNullOrEmpty(eu.Atcoder),
+                    Country = eu.Country,
+                    University = eu.University,
+                    IsExternal = true,
+                    AddedBy = eu.AddedBy,
+                    CodeforcesUsername = eu.Codeforces,
+                    LeetCodeUsername = eu.LeetCode,
+                    CodeChefUsername = eu.Codechef,
+                    AtCoderUsername = eu.Atcoder
+                };
+
+                try
+                {
+                    var platformStats = new List<PlatformStats>();
+
+                    if (!string.IsNullOrEmpty(eu.Codeforces))
+                    {
+                        var cfStats = await _apiManager.GetPlatformStatsAsync("codeforces", eu.Codeforces);
+                        if (cfStats?.IsConnected == true) platformStats.Add(cfStats);
+                    }
+                    if (!string.IsNullOrEmpty(eu.LeetCode))
+                    {
+                        var lcStats = await _apiManager.GetPlatformStatsAsync("leetcode", eu.LeetCode);
+                        if (lcStats?.IsConnected == true) platformStats.Add(lcStats);
+                    }
+                    if (!string.IsNullOrEmpty(eu.Codechef))
+                    {
+                        var ccStats = await _apiManager.GetPlatformStatsAsync("codechef", eu.Codechef);
+                        if (ccStats?.IsConnected == true) platformStats.Add(ccStats);
+                    }
+                    if (!string.IsNullOrEmpty(eu.Atcoder))
+                    {
+                        var acStats = await _apiManager.GetPlatformStatsAsync("atcoder", eu.Atcoder);
+                        if (acStats?.IsConnected == true) platformStats.Add(acStats);
+                    }
+
+                    if (platformStats.Any())
+                    {
+                        entry.CurrentRating = platformStats.Max(s => s.Rating);
+                        entry.MaxRating = platformStats.Max(s => s.MaxRating);
+                        entry.ProblemsSolved = platformStats.Sum(s => s.ProblemsSolved);
+                    }
+                    else
+                    {
+                        entry.CurrentRating = eu.MaxRating;
+                        entry.MaxRating = eu.MaxRating;
+                        entry.ProblemsSolved = eu.TotalSolved;
+                    }
+                }
+                catch
+                {
+                    entry.CurrentRating = eu.MaxRating;
+                    entry.MaxRating = eu.MaxRating;
+                    entry.ProblemsSolved = eu.TotalSolved;
+                }
+
+                allEntries.Add(entry);
+            }
+            
+            allEntries = sortBy.ToLower() switch
+            {
+                "currentrating" => allEntries.OrderByDescending(e => e.CurrentRating).ThenByDescending(e => e.ProblemsSolved).ToList(),
+                "rating" => allEntries.OrderByDescending(e => e.MaxRating).ThenByDescending(e => e.ProblemsSolved).ToList(),
+                "solved" => allEntries.OrderByDescending(e => e.ProblemsSolved).ThenByDescending(e => e.CurrentRating).ToList(),
+                "name" => allEntries.OrderBy(e => e.Name).ToList(),
+                _ => allEntries.OrderByDescending(e => e.CurrentRating).ThenByDescending(e => e.ProblemsSolved).ToList()
+            };
+
+            var paginatedEntries = allEntries
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
             
             for (int i = 0; i < paginatedEntries.Count; i++)
             {
@@ -207,7 +385,7 @@ namespace CodeCrakers.Services
     {
         public int Id { get; set; }
         public int Rank { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public bool HasCodeforces { get; set; }
         public bool HasCodeChef { get; set; }
         public bool HasLeetCode { get; set; }

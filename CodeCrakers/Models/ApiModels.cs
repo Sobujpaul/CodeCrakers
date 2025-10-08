@@ -26,6 +26,8 @@ namespace CodeCrakers.Models
         public long LastOnlineTimeSeconds { get; set; }
         public int FriendOfCount { get; set; }
         public string TitlePhoto { get; set; }
+        public int Contribution { get; set; }
+        public int ContestCount { get; set; } // This field exists in the API
     }
 
     public class CodeforcesSubmissionInfo

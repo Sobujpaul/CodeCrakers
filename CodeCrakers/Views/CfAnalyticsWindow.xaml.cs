@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 using CodeCrakers.Services;
 using CodeCrakers.Models;
@@ -14,8 +15,8 @@ namespace CodeCrakers.Views
     {
         private readonly string _username;
         private readonly CodeforcesApiService _codeforcesService;
-        private DetailedCodeforcesAnalytics _analytics;
-        private List<RatingChange> _ratingHistory;
+    private DetailedCodeforcesAnalytics? _analytics;
+    private List<RatingChange> _ratingHistory = new();
 
         public CfAnalyticsWindow(string codeforcesUsername, PlatformApiManager apiManager)
         {
@@ -79,7 +80,11 @@ namespace CodeCrakers.Views
                 txtCurrentRating.Text = _analytics.UserInfo?.Rating.ToString() ?? "0";
                 txtMaxRating.Text = _analytics.UserInfo?.MaxRating.ToString() ?? "0";
                 txtProblems.Text = _analytics.SolvedProblems.ToString();
-                txtContests.Text = _analytics.ContestsParticipated.ToString();
+                
+                // Use calculated contests participated from analytics (more reliable than API field)
+                var contestCount = _analytics.ContestsParticipated;
+                txtContests.Text = contestCount.ToString();
+                
                 txtAccuracy.Text = $"{_analytics.SuccessRate:F1}%";
 
                 // Populate submission analysis
@@ -111,27 +116,71 @@ namespace CodeCrakers.Views
             var totalProblems = _analytics.TopProblemTags.Values.Sum();
             var colors = new SolidColorBrush[]
             {
-                new SolidColorBrush(Color.FromRgb(52, 152, 219)),  // Blue
-                new SolidColorBrush(Color.FromRgb(46, 204, 113)),  // Green
-                new SolidColorBrush(Color.FromRgb(155, 89, 182)),  // Purple
-                new SolidColorBrush(Color.FromRgb(241, 196, 15)),  // Yellow
-                new SolidColorBrush(Color.FromRgb(230, 126, 34)),  // Orange
-                new SolidColorBrush(Color.FromRgb(231, 76, 60)),   // Red
-                new SolidColorBrush(Color.FromRgb(52, 73, 94)),    // Dark Blue
-                new SolidColorBrush(Color.FromRgb(142, 68, 173)),  // Dark Purple
+                new SolidColorBrush(Color.FromRgb(52, 152, 219)),   // Bright Blue
+                new SolidColorBrush(Color.FromRgb(46, 204, 113)),   // Emerald Green
+                new SolidColorBrush(Color.FromRgb(155, 89, 182)),   // Amethyst Purple
+                new SolidColorBrush(Color.FromRgb(241, 196, 15)),   // Sun Yellow
+                new SolidColorBrush(Color.FromRgb(230, 126, 34)),   // Carrot Orange
+                new SolidColorBrush(Color.FromRgb(231, 76, 60)),    // Alizarin Red
+                new SolidColorBrush(Color.FromRgb(52, 73, 94)),     // Wet Asphalt
+                new SolidColorBrush(Color.FromRgb(142, 68, 173)),   // Wisteria
+                new SolidColorBrush(Color.FromRgb(26, 188, 156)),   // Turquoise
+                new SolidColorBrush(Color.FromRgb(243, 156, 18)),   // Bright Orange
+                new SolidColorBrush(Color.FromRgb(192, 57, 43)),    // Pomegranate
+                new SolidColorBrush(Color.FromRgb(44, 62, 80)),     // Midnight Blue
+                new SolidColorBrush(Color.FromRgb(39, 174, 96)),    // Nephritis
+                new SolidColorBrush(Color.FromRgb(211, 84, 0)),     // Pumpkin
+                new SolidColorBrush(Color.FromRgb(125, 60, 152)),   // Royal Purple
             };
 
             double startAngle = 0;
             int colorIndex = 0;
+            int maxTags = Math.Min(_analytics.TopProblemTags.Count, colors.Length);
 
-            foreach (var tag in _analytics.TopProblemTags.Take(8))
+            foreach (var tag in _analytics.TopProblemTags.Take(maxTags))
             {
                 var percentage = (double)tag.Value / totalProblems;
                 var sweepAngle = 360 * percentage;
 
-                if (sweepAngle > 2) // Only draw significant slices
+                if (sweepAngle > 0.5) // draw very small slices only if > 0.5 degrees
                 {
-                    var slice = CreatePieSlice(centerX, centerY, radius, startAngle, sweepAngle, colors[colorIndex % colors.Length]);
+                    var brush = colors[colorIndex];
+                    var slice = CreatePieSlice(centerX, centerY, radius, startAngle, sweepAngle, brush);
+
+                    // Tooltip content (tag name, count, percentage)
+                    var percentText = (percentage * 100).ToString("F1");
+                    slice.ToolTip = new ToolTip
+                    {
+                        Content = $"{tag.Key}: {tag.Value} problems ({percentText}%)",
+                        Background = new SolidColorBrush(Color.FromArgb(230, 30, 30, 30)),
+                        Foreground = Brushes.White,
+                        Padding = new Thickness(8,4,8,4),
+                        Placement = System.Windows.Controls.Primitives.PlacementMode.Mouse
+                    };
+
+                    // Hover highlight (scale + brighter stroke)
+                    slice.Cursor = System.Windows.Input.Cursors.Hand;
+                    var originalStroke = slice.Stroke;
+                    var originalThickness = slice.StrokeThickness;
+                    slice.RenderTransformOrigin = new Point(0.5, 0.5);
+                    var scale = new ScaleTransform(1.0, 1.0);
+                    slice.RenderTransform = scale;
+
+                    slice.MouseEnter += (s, e) =>
+                    {
+                        scale.ScaleX = 1.07;
+                        scale.ScaleY = 1.07;
+                        slice.Stroke = new SolidColorBrush(Colors.Gold);
+                        slice.StrokeThickness = 2.0;
+                    };
+                    slice.MouseLeave += (s, e) =>
+                    {
+                        scale.ScaleX = 1.0;
+                        scale.ScaleY = 1.0;
+                        slice.Stroke = originalStroke;
+                        slice.StrokeThickness = originalThickness;
+                    };
+
                     problemTagsPieChart.Children.Add(slice);
                 }
 
@@ -195,24 +244,77 @@ namespace CodeCrakers.Views
                 .ToList();
 
             var maxCount = sortedDifficulties.Max(kvp => kvp.Value);
-            var colors = new SolidColorBrush[]
+            var highestRating = sortedDifficulties.Max(kvp => kvp.Key);
+
+            // Get color based on difficulty rating according to your exact scheme
+            SolidColorBrush GetDifficultyColor(int rating)
             {
-                new SolidColorBrush(Color.FromRgb(46, 204, 113)),  // Green
-                new SolidColorBrush(Color.FromRgb(52, 152, 219)),  // Blue
-                new SolidColorBrush(Color.FromRgb(155, 89, 182)),  // Purple
-                new SolidColorBrush(Color.FromRgb(241, 196, 15)),  // Yellow
-                new SolidColorBrush(Color.FromRgb(230, 126, 34)),  // Orange
-                new SolidColorBrush(Color.FromRgb(231, 76, 60))    // Red
-            };
+                return rating switch
+                {
+                    >= 800 and <= 1100 => new SolidColorBrush(Colors.Gray),
+                    >= 1200 and <= 1300 => new SolidColorBrush(Colors.Green),
+                    >= 1400 and <= 1500 => new SolidColorBrush(Colors.Cyan),
+                    >= 1600 and <= 1800 => new SolidColorBrush(Colors.Blue),
+                    >= 1900 and <= 2100 => new SolidColorBrush(Colors.Violet),
+                    >= 2200 and <= 2300 => new SolidColorBrush(Colors.Orange),
+                    >= 2400 and <= 2800 => new SolidColorBrush(Colors.Red),
+                    >= 2900 and <= 3500 => new SolidColorBrush(Colors.Red), // Red with white ray will be handled separately
+                    _ => new SolidColorBrush(Colors.Gray)
+                };
+            }
+
+            // Create responsive difficulty range - only show from 800 to highest solved
+            var responsiveDifficulties = new List<int>();
+            for (int rating = 800; rating <= highestRating; rating += 100)
+            {
+                responsiveDifficulties.Add(rating);
+            }
+
+            // Filter difficulties to only show solved problems within the responsive range
+            var filteredDifficulties = sortedDifficulties
+                .Where(kvp => responsiveDifficulties.Contains(kvp.Key))
+                .ToList();
 
             difficultyGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            for (int i = 0; i < sortedDifficulties.Count && i < 8; i++)
+            // Header row
+            difficultyGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            var headerPanel = new StackPanel
             {
-                difficultyGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+                Orientation = Orientation.Horizontal,
+                Margin = new Thickness(0, 0, 0, 8),
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            var highestLabel = new TextBlock
+            {
+                Text = $"Highest Rating Solved: {highestRating}",
+                FontSize = 14,
+                FontWeight = FontWeights.Bold,
+                Foreground = GetDifficultyColor(highestRating),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            if (highestRating >= 2900)
+            {
+                highestLabel.Effect = new DropShadowEffect
+                {
+                    Color = Colors.White,
+                    BlurRadius = 6,
+                    ShadowDepth = 0,
+                    Opacity = 0.9
+                };
+            }
+            headerPanel.Children.Add(highestLabel);
+            Grid.SetRow(headerPanel, 0);
+            difficultyGrid.Children.Add(headerPanel);
 
-                var difficulty = sortedDifficulties[i];
-                var percentage = (double)difficulty.Value / maxCount;
+            // Bar rows (limit 12)
+            int maxBars = Math.Min(filteredDifficulties.Count, 12);
+            for (int i = 0; i < maxBars; i++)
+            {
+                difficultyGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                var diffKvp = filteredDifficulties[i];
+                var percentage = (double)diffKvp.Value / maxCount;
+                var difficultyColor = GetDifficultyColor(diffKvp.Key);
 
                 var stackPanel = new StackPanel
                 {
@@ -222,34 +324,47 @@ namespace CodeCrakers.Views
 
                 var label = new TextBlock
                 {
-                    Text = difficulty.Key.ToString(),
-                    Width = 40,
-                    FontSize = 11,
-                    Foreground = Brushes.LightGray,
-                    VerticalAlignment = VerticalAlignment.Center
+                    Text = diffKvp.Key.ToString(),
+                    Width = 50,
+                    FontSize = 12,
+                    Foreground = difficultyColor,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    FontWeight = FontWeights.Bold
                 };
 
                 var bar = new Rectangle
                 {
-                    Height = 12,
-                    Width = Math.Max(percentage * 150, 1),
-                    Fill = colors[i % colors.Length],
-                    Margin = new Thickness(5, 0, 5, 0)
+                    Height = 14,
+                    Width = Math.Max(percentage * 140, 4), // slightly wider scaling
+                    Fill = difficultyColor,
+                    Margin = new Thickness(5, 0, 5, 0),
+                    RadiusX = 7,
+                    RadiusY = 7
                 };
+                if (diffKvp.Key >= 2900)
+                {
+                    bar.Effect = new DropShadowEffect
+                    {
+                        Color = Colors.White,
+                        BlurRadius = 8,
+                        ShadowDepth = 0,
+                        Opacity = 0.8
+                    };
+                }
 
                 var count = new TextBlock
                 {
-                    Text = difficulty.Value.ToString(),
+                    Text = diffKvp.Value.ToString(),
                     FontSize = 11,
                     Foreground = Brushes.White,
-                    VerticalAlignment = VerticalAlignment.Center
+                    VerticalAlignment = VerticalAlignment.Center,
+                    FontWeight = FontWeights.Medium
                 };
 
                 stackPanel.Children.Add(label);
                 stackPanel.Children.Add(bar);
                 stackPanel.Children.Add(count);
-
-                Grid.SetRow(stackPanel, i);
+                Grid.SetRow(stackPanel, i + 1); // shift by 1 for header row
                 difficultyGrid.Children.Add(stackPanel);
             }
         }
@@ -324,31 +439,72 @@ namespace CodeCrakers.Views
 
             if (_analytics?.TopProblemTags != null)
             {
+                // Use the same colors as the pie chart for consistency
                 var colors = new SolidColorBrush[]
                 {
-                    new SolidColorBrush(Color.FromRgb(52, 152, 219)),
-                    new SolidColorBrush(Color.FromRgb(46, 204, 113)),
-                    new SolidColorBrush(Color.FromRgb(155, 89, 182)),
-                    new SolidColorBrush(Color.FromRgb(241, 196, 15)),
-                    new SolidColorBrush(Color.FromRgb(230, 126, 34))
+                    new SolidColorBrush(Color.FromRgb(52, 152, 219)),   // Bright Blue
+                    new SolidColorBrush(Color.FromRgb(46, 204, 113)),   // Emerald Green
+                    new SolidColorBrush(Color.FromRgb(155, 89, 182)),   // Amethyst Purple
+                    new SolidColorBrush(Color.FromRgb(241, 196, 15)),   // Sun Yellow
+                    new SolidColorBrush(Color.FromRgb(230, 126, 34)),   // Carrot Orange
+                    new SolidColorBrush(Color.FromRgb(231, 76, 60)),    // Alizarin Red
+                    new SolidColorBrush(Color.FromRgb(52, 73, 94)),     // Wet Asphalt
+                    new SolidColorBrush(Color.FromRgb(142, 68, 173)),   // Wisteria
+                    new SolidColorBrush(Color.FromRgb(26, 188, 156)),   // Turquoise
+                    new SolidColorBrush(Color.FromRgb(243, 156, 18)),   // Bright Orange
+                    new SolidColorBrush(Color.FromRgb(192, 57, 43)),    // Pomegranate
+                    new SolidColorBrush(Color.FromRgb(44, 62, 80)),     // Midnight Blue
+                    new SolidColorBrush(Color.FromRgb(39, 174, 96)),    // Nephritis
+                    new SolidColorBrush(Color.FromRgb(211, 84, 0)),     // Pumpkin
+                    new SolidColorBrush(Color.FromRgb(125, 60, 152)),   // Royal Purple
                 };
 
                 int colorIndex = 0;
-                foreach (var tag in _analytics.TopProblemTags.Take(10))
+                int maxTags = Math.Min(_analytics.TopProblemTags.Count, colors.Length);
+                foreach (var tag in _analytics.TopProblemTags.Take(maxTags))
                 {
-                    var tagButton = new Button
-                    {
-                        Content = $"{tag.Key} ({tag.Value})",
-                        Background = colors[colorIndex % colors.Length],
-                        Foreground = Brushes.White,
-                        BorderBrush = Brushes.Transparent,
-                        Padding = new Thickness(8, 4, 8, 4),
-                        Margin = new Thickness(2),
-                        FontSize = 10,
-                        Cursor = System.Windows.Input.Cursors.Hand
-                    };
+                var tagButton = new Button
+                {
+                    Content = $"{tag.Key} ({tag.Value})",
+                    Background = colors[colorIndex],
+                    Foreground = Brushes.White,
+                    BorderBrush = Brushes.Transparent,
+                    BorderThickness = new Thickness(0),
+                    Padding = new Thickness(8, 4, 8, 4),
+                    Margin = new Thickness(2),
+                    FontSize = 10,
+                    FontWeight = FontWeights.Medium,
+                    Cursor = System.Windows.Input.Cursors.Hand
+                };
 
-                    problemTags.Children.Add(tagButton);
+                // Apply rounded corners using a simple style instead of template
+                var style = new Style(typeof(Button));
+                style.Setters.Add(new Setter(Button.TemplateProperty, tagButton.Template));
+                
+                // Create a simple border for rounded appearance
+                var border = new Border
+                {
+                    Background = colors[colorIndex],
+                    CornerRadius = new CornerRadius(12),
+                    Padding = new Thickness(8, 4, 8, 4),
+                    Margin = new Thickness(2),
+                    Cursor = System.Windows.Input.Cursors.Hand
+                };
+                
+                var textBlock = new TextBlock
+                {
+                    Text = $"{tag.Key} ({tag.Value})",
+                    Foreground = Brushes.White,
+                    FontSize = 10,
+                    FontWeight = FontWeights.Medium,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                
+                border.Child = textBlock;
+                
+                // Add the border instead of the button to avoid template issues
+                problemTags.Children.Add(border);
                     colorIndex++;
                 }
             }

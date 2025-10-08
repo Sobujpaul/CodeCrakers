@@ -163,5 +163,59 @@ ON CONFLICT(UserId) DO UPDATE SET
 
             return users;
         }
+
+        // Fetch ALL matching users without pagination so higher layers can perform correct cross-source sorting.
+        public List<UserProfile> GetLeaderboardAll(string? codeforcesSearch = null,
+                                                   string? country = null,
+                                                   string? university = null,
+                                                   string sortBy = "rating")
+        {
+            var users = new List<UserProfile>();
+            using var con = AppDb.GetConnection();
+            con.Open();
+
+            string sql = @"SELECT u.UserId, u.Codeforces, u.LeetCode, u.Codechef, u.Atcoder, 
+                                  u.DisplayName, u.Country, u.University, u.TotalRating, u.TotalSolved
+                           FROM UserProfiles u
+                           WHERE 1=1 ";
+
+            if (!string.IsNullOrEmpty(codeforcesSearch))
+                sql += " AND u.Codeforces LIKE @cfSearch ";
+            if (!string.IsNullOrEmpty(country))
+                sql += " AND u.Country = @country ";
+            if (!string.IsNullOrEmpty(university))
+                sql += " AND u.University = @university ";
+
+            sql += sortBy.ToLower() switch
+            {
+                "solved" => " ORDER BY u.TotalSolved DESC ",
+                _ => " ORDER BY u.TotalRating DESC "
+            };
+
+            using var cmd = new SqliteCommand(sql, con);
+            cmd.Parameters.AddWithValue("@cfSearch", $"%{codeforcesSearch}%");
+            cmd.Parameters.AddWithValue("@country", (object?)country ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@university", (object?)university ?? DBNull.Value);
+
+            using var r = cmd.ExecuteReader();
+            while (r.Read())
+            {
+                users.Add(new UserProfile
+                {
+                    UserId = r.GetInt32(0),
+                    Codeforces = r.IsDBNull(1) ? null : r.GetString(1),
+                    LeetCode = r.IsDBNull(2) ? null : r.GetString(2),
+                    Codechef = r.IsDBNull(3) ? null : r.GetString(3),
+                    Atcoder = r.IsDBNull(4) ? null : r.GetString(4),
+                    DisplayName = r.IsDBNull(5) ? $"User {r.GetInt32(0)}" : r.GetString(5),
+                    Country = r.IsDBNull(6) ? null : r.GetString(6),
+                    University = r.IsDBNull(7) ? null : r.GetString(7),
+                    TotalRating = r.IsDBNull(8) ? 0 : r.GetInt32(8),
+                    TotalSolved = r.IsDBNull(9) ? 0 : r.GetInt32(9)
+                });
+            }
+
+            return users;
+        }
     }
 }

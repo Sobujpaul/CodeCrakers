@@ -198,7 +198,7 @@
                     <Border Style="{StaticResource StatCard}" MinHeight="180">
                         <StackPanel>
                             <TextBlock Text="Problem Difficulty Distribution" Style="{StaticResource SectionHeader}"/>
-                            <Grid x:Name="difficultyGrid" Height="120" Margin="10">
+                            <Grid x:Name="difficultyGrid" MinHeight="120" Margin="10">
                                 <!-- Difficulty bars will be generated programmatically -->
                             </Grid>
                         </StackPanel>

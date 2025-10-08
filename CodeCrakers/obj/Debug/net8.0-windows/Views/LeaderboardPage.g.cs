@@ -183,7 +183,7 @@ namespace CodeCrakers.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/CodeCrakers;component/views/leaderboardpage.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/CodeCrakers;V1.0.0.0;component/views/leaderboardpage.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\LeaderboardPage.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

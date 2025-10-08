@@ -223,15 +223,17 @@
                         </Button.Template>
 
                     </Button>
-                    <TextBlock Text="Forgot Password?"
-                                Foreground="DarkGray"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                FontFamily="Montserrat"
-                                Margin="0,15,0,0"
+                    <TextBlock x:Name="txtForgotPassword"
+                               Text="Forgot Password?"
+                               Foreground="DarkGray"
+                               FontSize="12"
+                               FontWeight="Medium"
+                               FontFamily="Montserrat"
+                               Margin="0,15,0,0"
                                TextAlignment="Center"
                                Cursor="Hand"
-                               TextDecorations="Underline"/>
+                               TextDecorations="Underline"
+                               MouseDown="ForgotPassword_MouseDown"/>
                     <StackPanel Orientation="Horizontal"
                                 Margin="0,15,0,0">
                         <TextBlock Text="Don't have an account?"
