@@ -143,5 +143,130 @@ namespace CodeCrakers.Services
                 return false;
             }
         }
+
+        public async Task<DetailedCodeforcesAnalytics> GetDetailedAnalyticsAsync(string username)
+        {
+            try
+            {
+                var userInfo = await GetUserInfoAsync(username);
+                var submissions = await GetUserSubmissionsAsync(username, 1, 100000); // Get all submissions for all-time analysis
+                
+                var analytics = new DetailedCodeforcesAnalytics
+                {
+                    UserInfo = userInfo,
+                    TotalSubmissions = submissions.Count,
+                    LastActivity = submissions.Any() 
+                        ? DateTimeOffset.FromUnixTimeSeconds(submissions.Max(s => s.CreationTimeSeconds)).DateTime
+                        : DateTimeOffset.FromUnixTimeSeconds(userInfo.LastOnlineTimeSeconds).DateTime
+                };
+
+                // Calculate submission verdicts
+                analytics.VerdictStats = submissions
+                    .GroupBy(s => s.Verdict ?? "Unknown")
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                // Calculate accepted problems
+                var acceptedSubmissions = submissions.Where(s => s.Verdict == "OK").ToList();
+                analytics.SolvedProblems = acceptedSubmissions
+                    .Select(s => $"{s.Problem.ContestId}{s.Problem.Index}")
+                    .Distinct()
+                    .Count();
+
+                // Calculate problem difficulty distribution
+                var problemsWithRating = acceptedSubmissions
+                    .Where(s => s.Problem.Rating.HasValue)
+                    .Select(s => s.Problem.Rating.Value)
+                    .ToList();
+
+                analytics.DifficultyDistribution = problemsWithRating
+                    .GroupBy(r => (int)(r / 100) * 100) // Group by hundreds (800, 900, 1000, etc.)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                // Calculate problem tags statistics
+                var allTags = acceptedSubmissions
+                    .Where(s => s.Problem.Tags != null)
+                    .SelectMany(s => s.Problem.Tags)
+                    .ToList();
+
+                analytics.TopProblemTags = allTags
+                    .GroupBy(tag => tag)
+                    .OrderByDescending(g => g.Count())
+                    .Take(10)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                // Calculate programming languages
+                analytics.LanguageStats = submissions
+                    .Where(s => !string.IsNullOrEmpty(s.ProgrammingLanguage))
+                    .GroupBy(s => s.ProgrammingLanguage)
+                    .OrderByDescending(g => g.Count())
+                    .Take(10)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                // Calculate contests participated
+                analytics.ContestsParticipated = submissions
+                    .Where(s => s.ContestId > 0)
+                    .Select(s => s.ContestId)
+                    .Distinct()
+                    .Count();
+
+                // Get recent submissions (last 20)
+                analytics.RecentSubmissions = submissions
+                    .OrderByDescending(s => s.CreationTimeSeconds)
+                    .Take(20)
+                    .Select(s => new RecentSubmission
+                    {
+                        ProblemName = s.Problem?.Name ?? "Unknown",
+                        ProblemIndex = s.Problem?.Index ?? "A",
+                        ProblemRating = s.Problem?.Rating,
+                        Verdict = s.Verdict ?? "Unknown",
+                        Language = s.ProgrammingLanguage ?? "Unknown",
+                        SubmissionTime = DateTimeOffset.FromUnixTimeSeconds(s.CreationTimeSeconds).DateTime,
+                        ContestId = s.ContestId
+                    })
+                    .ToList();
+
+                // Calculate success rate
+                if (analytics.TotalSubmissions > 0)
+                {
+                    var acceptedCount = analytics.VerdictStats.GetValueOrDefault("OK", 0);
+                    analytics.SuccessRate = (double)acceptedCount / analytics.TotalSubmissions * 100;
+                }
+
+                return analytics;
+            }
+            catch (ApiException)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<RatingChange>> GetUserRatingHistoryAsync(string username)
+        {
+            try
+            {
+                var response = await GetAsync<CodeforcesRatingChangeInfo>($"user.rating?handle={username}");
+                
+                if (response?.Status == "OK" && response.Result != null)
+                {
+                    return response.Result.OrderBy(r => r.RatingUpdateTimeSeconds)
+                        .Select(r => new RatingChange
+                        {
+                            ContestName = r.ContestName,
+                            Rank = r.Rank,
+                            OldRating = r.OldRating,
+                            NewRating = r.NewRating,
+                            RatingChangeValue = r.NewRating - r.OldRating,
+                            ContestTime = DateTimeOffset.FromUnixTimeSeconds(r.RatingUpdateTimeSeconds).DateTime
+                        })
+                        .ToList();
+                }
+                
+                return new List<RatingChange>();
+            }
+            catch (ApiException)
+            {
+                return new List<RatingChange>();
+            }
+        }
     }
 }

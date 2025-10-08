@@ -23,7 +23,7 @@ namespace CodeCrakers.Views
 
         public void LoadLeaderboard()
         {
-            var sortBy = ((ComboBoxItem)cmbSort.SelectedItem)?.Tag?.ToString() ?? "rating";
+            var sortBy = ((ComboBoxItem)cmbSort.SelectedItem)?.Tag?.ToString() ?? "currentRating";
 
             // Handle placeholder text
             var searchText = (txtSearch.Text == "Search Name") ? "" : txtSearch.Text;
@@ -57,7 +57,7 @@ namespace CodeCrakers.Views
             currentPage = 1;
             foreach (var item in cmbSort.Items)
             {
-                if (item is ComboBoxItem cbi && (string)cbi.Tag == "rating")
+                if (item is ComboBoxItem cbi && (string)cbi.Tag == "currentRating")
                 {
                     cbi.IsSelected = true;
                     break;

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CodeCrakers")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+573ca76aabfbd66088ad4dfbee9c89ac431c080c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+98d2331c607b591c2fe1cd79b5feebef6024665c")]
 [assembly: System.Reflection.AssemblyProductAttribute("CodeCrakers")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CodeCrakers")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

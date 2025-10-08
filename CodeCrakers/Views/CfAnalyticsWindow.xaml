@@ -1,64 +1,348 @@
 <Window x:Class="CodeCrakers.Views.CfAnalyticsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="CF Analytics" WindowStartupLocation="CenterOwner" SizeToContent="WidthAndHeight"
-        Background="{StaticResource panelColor}">
-    <Border Padding="20" CornerRadius="10">
-        <StackPanel Width="520">
-            <StackPanel.Resources>
-                <Style TargetType="TextBlock">
-                    <Setter Property="Foreground" Value="{StaticResource titleColor1}"/>
-                    <Setter Property="FontFamily" Value="Montserrat"/>
-                </Style>
-                <Style TargetType="Border">
-                    <Setter Property="Background" Value="{StaticResource panelOverColor}"/>
-                    <Setter Property="CornerRadius" Value="8"/>
-                    <Setter Property="Padding" Value="12"/>
-                    <Setter Property="Margin" Value="0,8,0,0"/>
-                </Style>
-            </StackPanel.Resources>
-
-            <TextBlock x:Name="txtTitle" FontSize="20" FontWeight="SemiBold"/>
-
-            <Border>
+        xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
+        Title="CF Analytics" WindowStartupLocation="CenterOwner" 
+        Height="800" Width="1200" MinHeight="600" MinWidth="900"
+        Background="{StaticResource panelColor}" ResizeMode="CanResize">
+    
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource titleColor1}"/>
+            <Setter Property="FontFamily" Value="Montserrat"/>
+        </Style>
+        
+        <Style x:Key="StatCard" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource panelOverColor}"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderBrush" Value="{StaticResource color1}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#6D2FFF" BlurRadius="5" ShadowDepth="2" Opacity="0.2"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource color2}"/>
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect Color="#784DFD" BlurRadius="8" ShadowDepth="3" Opacity="0.4"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="SectionHeader" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource titleColor2}"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+        
+        <Style x:Key="StatValue" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{StaticResource color2}"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#6D2FFF" BlurRadius="2" ShadowDepth="1" Opacity="0.3"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="StatLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{StaticResource plainTextColor1}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </Window.Resources>
+    
+    <Border CornerRadius="15" BorderThickness="2">
+        <Border.BorderBrush>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="{StaticResource winBorderColor1}" Offset="0"/>
+                <GradientStop Color="{StaticResource winBorderColor2}" Offset="0.5"/>
+                <GradientStop Color="{StaticResource winBorderColor3}" Offset="1"/>
+            </LinearGradientBrush>
+        </Border.BorderBrush>
+        
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Header -->
+            <Border Grid.Row="0" Style="{StaticResource StatCard}" Margin="0,0,0,10">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Text="Current Rating" Grid.Row="0"/>
-                    <TextBlock x:Name="txtCurrentRating" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right"/>
-
-                    <TextBlock Text="Max Rating" Grid.Row="1"/>
-                    <TextBlock x:Name="txtMaxRating" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right"/>
-
-                    <TextBlock Text="Contests Participated" Grid.Row="2"/>
-                    <TextBlock x:Name="txtContests" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right"/>
+                    <StackPanel Orientation="Horizontal">
+                        <fa:IconImage Icon="ChartLine" Width="24" Height="24" 
+                                      Foreground="{StaticResource codeforcesColor}" 
+                                      VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <StackPanel>
+                            <TextBlock x:Name="txtTitle" FontSize="22" FontWeight="Bold" 
+                                       Foreground="{StaticResource titleColor2}"/>
+                            <TextBlock x:Name="txtUserInfo" FontSize="12" 
+                                       Foreground="{StaticResource plainTextColor1}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock x:Name="txtRank" FontSize="14" FontWeight="Medium" 
+                                   VerticalAlignment="Center" Margin="0,0,15,0"/>
+                        <Button x:Name="btnRefresh" Click="btnRefresh_Click" 
+                                Background="{StaticResource color6}" Foreground="White"
+                                BorderBrush="Transparent" Width="35" Height="35" 
+                                Cursor="Hand" ToolTip="Refresh Data">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" 
+                                            CornerRadius="17" BorderBrush="{TemplateBinding BorderBrush}" 
+                                            BorderThickness="{TemplateBinding BorderThickness}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                            <fa:IconImage Icon="ArrowsRotate" Width="16" Height="16"/>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Border>
-
-            <Border>
-                <StackPanel>
-                    <TextBlock Text="Problems Solved"/>
-                    <TextBlock x:Name="txtProblems" FontSize="16" FontWeight="SemiBold"/>
+            
+            <!-- Statistics Cards Row -->
+            <Grid Grid.Row="1" Margin="0,0,0,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Current Rating -->
+                <Border Grid.Column="0" Style="{StaticResource StatCard}">
+                    <StackPanel>
+                        <fa:IconImage Icon="Star" Width="20" Height="20" 
+                                      Foreground="{StaticResource codeforcesColor}" 
+                                      HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                        <TextBlock x:Name="txtCurrentRating" Style="{StaticResource StatValue}"/>
+                        <TextBlock Text="Current Rating" Style="{StaticResource StatLabel}"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Max Rating -->
+                <Border Grid.Column="1" Style="{StaticResource StatCard}">
+                    <StackPanel>
+                        <fa:IconImage Icon="Trophy" Width="20" Height="20" 
+                                      Foreground="{StaticResource color4}" 
+                                      HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                        <TextBlock x:Name="txtMaxRating" Style="{StaticResource StatValue}"/>
+                        <TextBlock Text="Max Rating" Style="{StaticResource StatLabel}"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Problems Solved -->
+                <Border Grid.Column="2" Style="{StaticResource StatCard}">
+                    <StackPanel>
+                        <fa:IconImage Icon="CheckCircle" Width="20" Height="20" 
+                                      Foreground="{StaticResource color3}" 
+                                      HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                        <TextBlock x:Name="txtProblems" Style="{StaticResource StatValue}"/>
+                        <TextBlock Text="Problems Solved" Style="{StaticResource StatLabel}"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Contests -->
+                <Border Grid.Column="3" Style="{StaticResource StatCard}">
+                    <StackPanel>
+                        <fa:IconImage Icon="Calendar" Width="20" Height="20" 
+                                      Foreground="{StaticResource color5}" 
+                                      HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                        <TextBlock x:Name="txtContests" Style="{StaticResource StatValue}"/>
+                        <TextBlock Text="Contests" Style="{StaticResource StatLabel}"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Submission Accuracy -->
+                <Border Grid.Column="4" Style="{StaticResource StatCard}">
+                    <StackPanel>
+                        <fa:IconImage Icon="Percentage" Width="20" Height="20" 
+                                      Foreground="{StaticResource color8}" 
+                                      HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                        <TextBlock x:Name="txtAccuracy" Style="{StaticResource StatValue}"/>
+                        <TextBlock Text="Success Rate" Style="{StaticResource StatLabel}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            
+            <!-- Main Content Area -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Left Side - Charts and Analysis -->
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                    
+                    <!-- Problem Difficulty Distribution -->
+                    <Border Style="{StaticResource StatCard}" MinHeight="180">
+                        <StackPanel>
+                            <TextBlock Text="Problem Difficulty Distribution" Style="{StaticResource SectionHeader}"/>
+                            <Grid x:Name="difficultyGrid" Height="120" Margin="10">
+                                <!-- Difficulty bars will be generated programmatically -->
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Submission Verdicts -->
+                    <Border Style="{StaticResource StatCard}">
+                        <StackPanel>
+                            <TextBlock Text="Submission Analysis" Style="{StaticResource SectionHeader}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                
+                                <TextBlock Text="Accepted:" Grid.Row="0" Grid.Column="0" FontWeight="Medium"/>
+                                <TextBlock x:Name="txtAccepted" Grid.Row="0" Grid.Column="1" 
+                                           Foreground="{StaticResource color3}" HorizontalAlignment="Right"/>
+                                
+                                <TextBlock Text="Wrong Answer:" Grid.Row="1" Grid.Column="0" FontWeight="Medium"/>
+                                <TextBlock x:Name="txtWrongAnswer" Grid.Row="1" Grid.Column="1" 
+                                           Foreground="{StaticResource color4}" HorizontalAlignment="Right"/>
+                                
+                                <TextBlock Text="Time Limit:" Grid.Row="2" Grid.Column="0" FontWeight="Medium"/>
+                                <TextBlock x:Name="txtTimeLimit" Grid.Row="2" Grid.Column="1" 
+                                           Foreground="{StaticResource color8}" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
-            </Border>
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-                <Button x:Name="btnOpenProfile" Content="Open on Codeforces" Click="btnOpenProfile_Click"
+                
+                <!-- Right Side - Details and Lists -->
+                <StackPanel Grid.Column="1">
+                    
+                    <!-- Recent Activity -->
+                    <Border Style="{StaticResource StatCard}">
+                        <StackPanel>
+                            <TextBlock Text="Recent Activity" Style="{StaticResource SectionHeader}"/>
+                            <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
+                                <StackPanel x:Name="recentActivity">
+                                    <!-- Recent submissions will be populated here -->
+                                </StackPanel>
+                            </ScrollViewer>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Favorite Problem Tags -->
+                    <Border Style="{StaticResource StatCard}">
+                        <StackPanel>
+                            <TextBlock Text="Top Problem Tags" Style="{StaticResource SectionHeader}"/>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="200"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                
+                                <!-- Pie Chart -->
+                                <Canvas x:Name="problemTagsPieChart" Grid.Row="0" 
+                                        Background="{StaticResource panelColor}" 
+                                        Height="180" Margin="10"/>
+                                
+                                <!-- Tag Buttons -->
+                                <WrapPanel x:Name="problemTags" Grid.Row="1" 
+                                           Orientation="Horizontal" Margin="0,10,0,0">
+                                    <!-- Problem tags will be populated here -->
+                                </WrapPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Programming Languages -->
+                    <Border Style="{StaticResource StatCard}">
+                        <StackPanel>
+                            <TextBlock Text="Languages Used" Style="{StaticResource SectionHeader}"/>
+                            <StackPanel x:Name="languageStats">
+                                <!-- Language statistics will be populated here -->
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    
+                </StackPanel>
+                </Grid>
+            </ScrollViewer>
+            
+            <!-- Footer -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                <Button x:Name="btnOpenProfile" Click="btnOpenProfile_Click"
                         Background="{StaticResource codeforcesColor}" Foreground="White"
-                        BorderBrush="Transparent" Padding="10,6" Margin="0,0,8,0" Cursor="Hand"/>
+                        BorderBrush="Transparent" Padding="15,8" Margin="0,0,10,0" 
+                        Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" 
+                                    CornerRadius="5" BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <fa:IconImage Icon="ExternalLinkAlt" Width="14" Height="14" Margin="0,0,8,0"/>
+                            <TextBlock Text="Open Profile"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                
                 <Button Content="Close" IsCancel="True"
                         Background="{StaticResource panelOverColor}" Foreground="{StaticResource titleColor1}"
-                        BorderBrush="{StaticResource color1}" Padding="10,6" Cursor="Hand"/>
+                        BorderBrush="{StaticResource color1}" Padding="15,8" 
+                        Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" 
+                                    CornerRadius="5" BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
             </StackPanel>
-        </StackPanel>
+            
+            <!-- Loading Overlay -->
+            <Border x:Name="loadingOverlay" Grid.RowSpan="4" 
+                    Background="#80000000" CornerRadius="15"
+                    Visibility="Visible">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ProgressBar Width="200" Height="4" IsIndeterminate="True" 
+                                 Background="{StaticResource panelOverColor}"
+                                 Foreground="{StaticResource codeforcesColor}" Margin="0,0,0,15"/>
+                    <TextBlock Text="Loading Codeforces Analytics..." 
+                               FontSize="16" Foreground="White" 
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Border>
 </Window>
 

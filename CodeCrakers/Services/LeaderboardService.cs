@@ -33,6 +33,7 @@ namespace CodeCrakers.Services
                 HasCodeChef = !string.IsNullOrEmpty(u.Codechef),
                 HasLeetCode = !string.IsNullOrEmpty(u.LeetCode),
                 HasAtCoder = !string.IsNullOrEmpty(u.Atcoder),
+                CurrentRating = u.TotalRating, // For now, use TotalRating as current rating
                 MaxRating = u.TotalRating,
                 ProblemsSolved = u.TotalSolved,
                 Country = u.Country,
@@ -57,6 +58,7 @@ namespace CodeCrakers.Services
                 HasCodeChef = !string.IsNullOrEmpty(eu.Codechef),
                 HasLeetCode = !string.IsNullOrEmpty(eu.LeetCode),
                 HasAtCoder = !string.IsNullOrEmpty(eu.Atcoder),
+                CurrentRating = eu.MaxRating, // For external users, assume max rating is current rating
                 MaxRating = eu.MaxRating,
                 ProblemsSolved = eu.TotalSolved,
                 Country = eu.Country,
@@ -75,10 +77,11 @@ namespace CodeCrakers.Services
             // Sort based on criteria
             allEntries = sortBy.ToLower() switch
             {
+                "currentrating" => allEntries.OrderByDescending(e => e.CurrentRating).ThenByDescending(e => e.ProblemsSolved).ToList(),
                 "rating" => allEntries.OrderByDescending(e => e.MaxRating).ThenByDescending(e => e.ProblemsSolved).ToList(),
-                "solved" => allEntries.OrderByDescending(e => e.ProblemsSolved).ThenByDescending(e => e.MaxRating).ToList(),
+                "solved" => allEntries.OrderByDescending(e => e.ProblemsSolved).ThenByDescending(e => e.CurrentRating).ToList(),
                 "name" => allEntries.OrderBy(e => e.Name).ToList(),
-                _ => allEntries.OrderByDescending(e => e.MaxRating).ThenByDescending(e => e.ProblemsSolved).ToList()
+                _ => allEntries.OrderByDescending(e => e.CurrentRating).ThenByDescending(e => e.ProblemsSolved).ToList()
             };
             
             // Apply pagination and set ranks
@@ -209,6 +212,7 @@ namespace CodeCrakers.Services
         public bool HasCodeChef { get; set; }
         public bool HasLeetCode { get; set; }
         public bool HasAtCoder { get; set; }
+        public int CurrentRating { get; set; }    // Current rating from platforms
         public int MaxRating { get; set; }        // Updated from CodeforcesRating
         public int ProblemsSolved { get; set; }
         public string? Country { get; set; }

@@ -44,6 +44,41 @@ namespace CodeCrakers.Models
         public Problem? Problem { get; set; }
     }
 
+    public class CodeforcesRatingChangeInfo
+    {
+        public string? Status { get; set; }
+        public List<CodeforcesRatingChangeEntry>? Result { get; set; }
+    }
+
+    public class CodeforcesRatingChangeEntry
+    {
+        public int ContestId { get; set; }
+        public string ContestName { get; set; }
+        public int Handle { get; set; }
+        public int Rank { get; set; }
+        public long RatingUpdateTimeSeconds { get; set; }
+        public int OldRating { get; set; }
+        public int NewRating { get; set; }
+    }
+
+    public class CodeforcesContestResponse
+    {
+        public string? Status { get; set; }
+        public List<CodeforcesContest>? Result { get; set; }
+    }
+
+    public class CodeforcesContest
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Phase { get; set; }
+        public bool Frozen { get; set; }
+        public long DurationSeconds { get; set; }
+        public long StartTimeSeconds { get; set; }
+        public long RelativeTimeSeconds { get; set; }
+    }
+
     public class Problem
     {
         public int ContestId { get; set; }
@@ -185,5 +220,44 @@ namespace CodeCrakers.Models
         public int RatingChange { get; set; }
         public DateTime WeekStart { get; set; }
         public DateTime WeekEnd { get; set; }
+    }
+
+    // Detailed Analytics Models
+    public class DetailedCodeforcesAnalytics
+    {
+        public CodeforcesUser UserInfo { get; set; }
+        public int TotalSubmissions { get; set; }
+        public int SolvedProblems { get; set; }
+        public int ContestsParticipated { get; set; }
+        public double SuccessRate { get; set; }
+        public DateTime LastActivity { get; set; }
+        
+        public Dictionary<string, int> VerdictStats { get; set; } = new Dictionary<string, int>();
+        public Dictionary<int, int> DifficultyDistribution { get; set; } = new Dictionary<int, int>();
+        public Dictionary<string, int> TopProblemTags { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string, int> LanguageStats { get; set; } = new Dictionary<string, int>();
+        
+        public List<RecentSubmission> RecentSubmissions { get; set; } = new List<RecentSubmission>();
+    }
+
+    public class RecentSubmission
+    {
+        public string ProblemName { get; set; }
+        public string ProblemIndex { get; set; }
+        public double? ProblemRating { get; set; }
+        public string Verdict { get; set; }
+        public string Language { get; set; }
+        public DateTime SubmissionTime { get; set; }
+        public int ContestId { get; set; }
+    }
+
+    public class RatingChange
+    {
+        public string ContestName { get; set; }
+        public int Rank { get; set; }
+        public int OldRating { get; set; }
+        public int NewRating { get; set; }
+        public int RatingChangeValue { get; set; }
+        public DateTime ContestTime { get; set; }
     }
 }

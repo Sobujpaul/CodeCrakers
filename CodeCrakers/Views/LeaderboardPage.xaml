@@ -114,7 +114,7 @@
                         </Style>
                      </ComboBox.Resources>
 
-                     <ComboBoxItem Content="Max Rating" Tag="rating" IsSelected="True"/>
+                     <ComboBoxItem Content="Current Rating" Tag="currentRating" IsSelected="True"/>
                      <ComboBoxItem Content="Solved Problems" Tag="solved"/>
               </ComboBox>
 
@@ -186,6 +186,16 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                
+                <DataGridTextColumn Header="Current Rating" Binding="{Binding CurrentRating}" Width="110">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Foreground" Value="{StaticResource codeforcesColor}"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
                 
                 <DataGridTextColumn Header="Max Rating" Binding="{Binding MaxRating}" Width="100">
                     <DataGridTextColumn.ElementStyle>
