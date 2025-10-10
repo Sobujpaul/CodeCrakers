@@ -5,11 +5,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
     <UserControl.Resources>
-        <!-- High contrast brushes (local, so we don't rely on existing theme contrast) -->
-    <!-- Match panels to the application main background colors -->
-    <SolidColorBrush x:Key="ComparePanelBackground" Color="{StaticResource primaryBackColor1}"/>
-    <SolidColorBrush x:Key="ComparePanelAltBackground" Color="{StaticResource primaryBackColor2}"/>
-        <SolidColorBrush x:Key="CompareLabelBrush" Color="#B0BAC8"/>
+        <!-- Force all text to white on this page -->
+        <!-- Override commonly used brushes to white -->
+        <SolidColorBrush x:Key="titleColor1" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="plainTextColor1" Color="#FFFFFF"/>
+
+        <!-- Panel backgrounds keep using app background colors -->
+        <SolidColorBrush x:Key="ComparePanelBackground" Color="{StaticResource primaryBackColor1}"/>
+        <SolidColorBrush x:Key="ComparePanelAltBackground" Color="{StaticResource primaryBackColor2}"/>
+
+        <!-- Local text brushes set to white -->
+        <SolidColorBrush x:Key="CompareLabelBrush" Color="#FFFFFF"/>
         <SolidColorBrush x:Key="CompareValueBrush" Color="#FFFFFF"/>
         <Style x:Key="CompareLabelText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource CompareLabelBrush}"/>
@@ -26,6 +32,10 @@
             <Setter Property="Foreground" Value="{StaticResource CompareValueBrush}"/>
             <Setter Property="FontFamily" Value="Montserrat"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <!-- Default TextBlock style to ensure white if not otherwise styled -->
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FFFFFF"/>
         </Style>
     </UserControl.Resources>
     <Grid Margin="10">
@@ -222,6 +232,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>

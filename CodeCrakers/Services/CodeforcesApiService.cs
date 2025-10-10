@@ -337,5 +337,44 @@ namespace CodeCrakers.Services
                 return new AttemptMetrics();
             }
         }
+
+        // Fetch full Codeforces problemset (problems + stats)
+        public async Task<CodeforcesProblemsetResult> GetProblemsetAsync()
+        {
+            var response = await GetAsync<CodeforcesProblemsetResponse>("problemset.problems");
+            if (response?.Status == "OK" && response.Result != null)
+            {
+                return response.Result;
+            }
+            throw new ApiException("Failed to fetch Codeforces problemset");
+        }
+
+        // Build suggestion list: unsolved problems with rating <= user rating + 200
+    public async Task<List<Problem>> GetSuggestionsAsync(string username, int maxCount = 20)
+        {
+            // Get user info (rating) and all submissions for solved set
+            var userInfo = await GetUserInfoAsync(username);
+            var rating = Math.Max(0, userInfo.Rating);
+            var minThreshold = Math.Max(0, rating - 100);
+            var maxThreshold = rating + 200;
+
+            var submissions = await GetAllUserSubmissionsAsync(username, 1000);
+            var solvedKeys = new HashSet<string>(
+                submissions
+                    .Where(s => s.Verdict == "OK" && s.Problem != null)
+                    .Select(s => $"{s.Problem!.ContestId}-{s.Problem!.Index}")
+            );
+
+            var problemset = await GetProblemsetAsync();
+            var candidates = problemset.Problems
+                .Where(p => p.Rating.HasValue && p.Rating.Value >= minThreshold && p.Rating.Value <= maxThreshold)
+                .Where(p => !solvedKeys.Contains($"{p.ContestId}-{p.Index}"))
+                .OrderBy(p => p.Rating ?? double.MaxValue)
+                .ThenBy(p => p.Name)
+                .Take(maxCount)
+                .ToList();
+
+            return candidates;
+        }
     }
 }

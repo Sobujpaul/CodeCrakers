@@ -19,6 +19,7 @@ namespace CodeCrakers
     private ComparePage? _comparePage;
     private CompareResultPage? _compareResultPage;
     private NotificationPage? _notificationPage;
+    private SuggestionPage? _suggestionPage;
 
         public MainWindow(int userId) // receive userId from LoginPage
         {
@@ -241,9 +242,19 @@ namespace CodeCrakers
 
         public void OnSuggestionClick(object sender, RoutedEventArgs e)
         {
-            // TODO: Implement suggestions page
-            MessageBox.Show("Suggestions feature coming soon!", "Feature Preview", 
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            try
+            {
+                if (_suggestionPage == null)
+                {
+                    _suggestionPage = new SuggestionPage(_userId);
+                }
+                contentArea.Content = _suggestionPage;
+                txtPageTitle.Text = "Suggestions";
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Failed to open Suggestions page: {ex.Message}", "Suggestions", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         public void OnCompareClick(object sender, RoutedEventArgs e)

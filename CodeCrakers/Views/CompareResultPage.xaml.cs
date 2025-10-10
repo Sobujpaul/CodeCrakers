@@ -127,12 +127,7 @@ namespace CodeCrakers.Views
             if (diff > 0) formatted = "+" + formatted;
             tb.Text = formatted;
             bool positiveMeaningBetter = higherIsBetter ? diff > 0 : diff < 0;
-            if (diff == 0)
-                tb.Foreground = Brushes.Gray;
-            else if (positiveMeaningBetter)
-                tb.Foreground = Brushes.LimeGreen;
-            else
-                tb.Foreground = Brushes.OrangeRed;
+            // Keep inherited foreground (white); use FontWeight only
             tb.FontWeight = FontWeights.SemiBold;
         }
 
@@ -194,20 +189,8 @@ namespace CodeCrakers.Views
         private void SetRatingText(TextBlock tb, int rating)
         {
             tb.Text = rating.ToString();
-            tb.Foreground = GetRatingBrush(rating);
+            // Keep foreground inherited (white) and emphasize weight
             tb.FontWeight = FontWeights.Bold;
-        }
-
-        private Brush GetRatingBrush(int rating)
-        {
-            // Codeforces color tiers
-            if (rating >= 2400) return Brushes.Red;
-            if (rating >= 2100) return Brushes.Orange;
-            if (rating >= 1900) return Brushes.Purple;
-            if (rating >= 1600) return Brushes.Blue;
-            if (rating >= 1400) return Brushes.CadetBlue; // cyan-ish
-            if (rating >= 1200) return Brushes.Green;
-            return Brushes.Gray;
         }
 
         private void Back_Click(object sender, RoutedEventArgs e)

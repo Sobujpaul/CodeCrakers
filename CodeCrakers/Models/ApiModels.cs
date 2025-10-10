@@ -81,6 +81,26 @@ namespace CodeCrakers.Models
         public long RelativeTimeSeconds { get; set; }
     }
 
+    // Codeforces problemset models
+    public class CodeforcesProblemsetResponse
+    {
+        public string? Status { get; set; }
+        public CodeforcesProblemsetResult? Result { get; set; }
+    }
+
+    public class CodeforcesProblemsetResult
+    {
+        public List<Problem> Problems { get; set; } = new();
+        public List<CodeforcesProblemStatistics> ProblemStatistics { get; set; } = new();
+    }
+
+    public class CodeforcesProblemStatistics
+    {
+        public int ContestId { get; set; }
+        public string Index { get; set; } = string.Empty;
+        public int SolvedCount { get; set; }
+    }
+
     public class Problem
     {
         public int ContestId { get; set; }
