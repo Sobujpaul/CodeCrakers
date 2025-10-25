@@ -62,15 +62,20 @@
         <!-- Content -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <Grid>
+                <!-- Compact top comparison section: two user cards side-by-side, then Differences below -->
+                <Grid HorizontalAlignment="Center" MaxWidth="1200">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!-- Left User Panel -->
-            <Border Grid.Column="0" Background="{StaticResource ComparePanelBackground}" Padding="15" CornerRadius="8" BorderBrush="{StaticResource panelOverColor}" BorderThickness="1">
+            <Border Grid.Row="0" Grid.Column="0" Background="{StaticResource ComparePanelBackground}" Padding="15" CornerRadius="8" BorderBrush="{StaticResource panelOverColor}" BorderThickness="1">
                 <StackPanel>
                     <TextBlock x:Name="txtHandle1" Text="Handle1" Style="{StaticResource CompareHeadline}" FontSize="20"/>
                     <StackPanel Orientation="Horizontal" Margin="0,4,0,8">
@@ -104,7 +109,7 @@
             </Border>
 
             <!-- Right User Panel -->
-            <Border Grid.Column="2" Background="{StaticResource ComparePanelBackground}" Padding="15" CornerRadius="8" BorderBrush="{StaticResource panelOverColor}" BorderThickness="1">
+            <Border Grid.Row="0" Grid.Column="2" Background="{StaticResource ComparePanelBackground}" Padding="15" CornerRadius="8" BorderBrush="{StaticResource panelOverColor}" BorderThickness="1">
                 <StackPanel>
                     <TextBlock x:Name="txtHandle2" Text="Handle2" Style="{StaticResource CompareHeadline}" FontSize="20"/>
                     <StackPanel Orientation="Horizontal" Margin="0,4,0,8">
@@ -137,8 +142,8 @@
                 </StackPanel>
             </Border>
 
-            <!-- Middle Summary / Differences -->
-            <Border Grid.Column="1" Background="{StaticResource ComparePanelAltBackground}" CornerRadius="6" Padding="10"  >
+            <!-- Differences Section BELOW the two user panels -->
+            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="{StaticResource ComparePanelAltBackground}" CornerRadius="6" Padding="10" Margin="0,12,0,0">
                 <StackPanel>
                     <TextBlock Text="Differences" Style="{StaticResource CompareHeadline}" FontSize="16" Margin="0,0,0,8" HorizontalAlignment="Center"/>
                     <Separator Margin="0,0,0,6"/>
@@ -220,42 +225,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Problem Solving Efficiency -->
-                <Border Margin="0,18,0,30" Background="{StaticResource ComparePanelBackground}" Padding="14" CornerRadius="8" BorderBrush="{StaticResource panelOverColor}" BorderThickness="1">
-                    <StackPanel>
-                        <TextBlock Text="Problem Solving Efficiency" FontFamily="Montserrat" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10"/>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="Metric" FontWeight="Bold" FontFamily="Montserrat"/>
-                            <TextBlock Text="User1" Grid.Column="1" FontWeight="Bold" FontFamily="Montserrat"/>
-                            <TextBlock Text="User2" Grid.Column="2" FontWeight="Bold" FontFamily="Montserrat"/>
-                            <TextBlock Text="Δ" Grid.Column="3" FontWeight="Bold" FontFamily="Montserrat"/>
-                            <TextBlock Text="Avg Attempts" Grid.Row="1"/>
-                            <TextBlock x:Name="valAvgAttempts1" Grid.Row="1" Grid.Column="1" Foreground="{StaticResource titleColor1}"/>
-                            <TextBlock x:Name="valAvgAttempts2" Grid.Row="1" Grid.Column="2" Foreground="{StaticResource titleColor1}"/>
-                            <TextBlock x:Name="diffAvgAttempts" Grid.Row="1" Grid.Column="3" Foreground="{StaticResource titleColor1}"/>
-                            <TextBlock Text="Max Attempts" Grid.Row="2"/>
-                            <TextBlock x:Name="valMaxAttempts1" Grid.Row="2" Grid.Column="1" Foreground="{StaticResource titleColor1}"/>
-                            <TextBlock x:Name="valMaxAttempts2" Grid.Row="2" Grid.Column="2" Foreground="{StaticResource titleColor1}"/>
-                            <TextBlock x:Name="diffMaxAttempts" Grid.Row="2" Grid.Column="3" Foreground="{StaticResource titleColor1}"/>
-                            <TextBlock Text="One-Shot %" Grid.Row="3"/>
-                            <TextBlock x:Name="valOneShot1" Grid.Row="3" Grid.Column="1" Foreground="{StaticResource titleColor1}"/>
-                            <TextBlock x:Name="valOneShot2" Grid.Row="3" Grid.Column="2" Foreground="{StaticResource titleColor1}"/>
-                            <TextBlock x:Name="diffOneShot" Grid.Row="3" Grid.Column="3" Foreground="{StaticResource titleColor1}"/>
-                        </Grid>
-                    </StackPanel>
-                </Border>
+                
             </StackPanel>
         </ScrollViewer>
     </Grid>

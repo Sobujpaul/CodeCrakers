@@ -105,31 +105,31 @@ namespace CodeCrakers.Services
             }
         }
 
-        public async Task<WeeklyStats> GetWeeklyStatsAsync(string username)
+        public Task<WeeklyStats> GetWeeklyStatsAsync(string username)
         {
             try
             {
                 // CodeChef weekly stats would require more complex scraping
                 // For now, return empty stats
-                return new WeeklyStats
+                return Task.FromResult(new WeeklyStats
                 {
                     ProblemsSolved = 0,
                     ContestsParticipated = 0,
                     RatingChange = 0,
                     WeekStart = DateTime.UtcNow.AddDays(-7),
                     WeekEnd = DateTime.UtcNow
-                };
+                });
             }
             catch (ApiException)
             {
-                return new WeeklyStats
+                return Task.FromResult(new WeeklyStats
                 {
                     ProblemsSolved = 0,
                     ContestsParticipated = 0,
                     RatingChange = 0,
                     WeekStart = DateTime.UtcNow.AddDays(-7),
                     WeekEnd = DateTime.UtcNow
-                };
+                });
             }
         }
 

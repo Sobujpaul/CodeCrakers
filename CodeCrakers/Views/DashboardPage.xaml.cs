@@ -11,8 +11,8 @@ namespace CodeCrakers.Views
     public partial class DashboardPage : UserControl
     {
         private int _userId;
-        private UserProfileRepository _profileRepo;
-        private PlatformApiManager _apiManager;
+    private UserProfileRepository _profileRepo = null!;
+    private PlatformApiManager _apiManager = null!;
 
         public DashboardPage(int userId)
         {
@@ -253,7 +253,7 @@ namespace CodeCrakers.Views
             }
         }
 
-        private async Task UpdatePlatformBox(string platformName, string username, TextBlock usernameTextBlock, TextBlock statusTextBlock, Border platformBox)
+        private async Task UpdatePlatformBox(string platformName, string? username, TextBlock usernameTextBlock, TextBlock statusTextBlock, Border platformBox)
         {
             try
             {
@@ -411,7 +411,7 @@ namespace CodeCrakers.Views
             {
                 // Get user profile to find username
                 var profile = _profileRepo.GetByUserId(_userId);
-                string username = GetPlatformUsername(profile, platformName);
+                string? username = GetPlatformUsername(profile, platformName);
                 
                 if (string.IsNullOrEmpty(username))
                 {
@@ -432,11 +432,30 @@ namespace CodeCrakers.Views
                 
                 if (stats.IsConnected)
                 {
+                    // Default mappings
                     PlatformDetailsRating.Text = stats.Rating.ToString();
                     PlatformDetailsProblems.Text = stats.ProblemsSolved.ToString();
                     PlatformDetailsContests.Text = stats.ContestsParticipated.ToString();
                     PlatformDetailsMaxRating.Text = stats.MaxRating.ToString();
-                    PlatformDetailsRank.Text = "N/A"; // Rank not available in current API
+                    PlatformDetailsRank.Text = "N/A";
+
+                    // Platform-specific adjustments
+                    if (platformName.Equals("LeetCode", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // LeetCode has no rating system comparable to Codeforces; show N/A
+                        PlatformDetailsRating.Text = "N/A";
+                        PlatformDetailsMaxRating.Text = "N/A";
+
+                        try
+                        {
+                            // Fetch Rank via service (GraphQL + community fallback inside GetUserInfoAsync)
+                            var lc = new Services.LeetCodeApiService();
+                            var info = await lc.GetUserInfoAsync(username);
+                            var rankText = info?.Profile?.Ranking;
+                            PlatformDetailsRank.Text = string.IsNullOrWhiteSpace(rankText) || rankText == "0" ? "N/A" : rankText;
+                        }
+                        catch { PlatformDetailsRank.Text = "N/A"; }
+                    }
                 }
                 else
                 {
@@ -461,7 +480,7 @@ namespace CodeCrakers.Views
             }
         }
 
-        private string GetPlatformUsername(UserProfile profile, string platformName)
+        private string? GetPlatformUsername(UserProfile profile, string platformName)
         {
             return platformName.ToLower() switch
             {
@@ -514,7 +533,7 @@ namespace CodeCrakers.Views
         private string GetPlatformUrl(string platformName)
         {
             var profile = _profileRepo.GetByUserId(_userId);
-            string username = GetPlatformUsername(profile, platformName);
+            string? username = GetPlatformUsername(profile, platformName);
             
             if (string.IsNullOrEmpty(username))
                 return "";
@@ -582,7 +601,7 @@ namespace CodeCrakers.Views
             }
         }
 
-        private async Task UpdateDetailedPlatformStatsAsync(List<PlatformStats> allStats)
+        private Task UpdateDetailedPlatformStatsAsync(List<PlatformStats> allStats)
         {
             try
             {
@@ -631,6 +650,7 @@ namespace CodeCrakers.Views
                 System.Diagnostics.Debug.WriteLine($"Error updating detailed platform stats: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
             }
+            return Task.CompletedTask;
         }
 
         private void UpdatePerformanceOverview(WeeklyStats weeklyStats, List<PlatformStats> allStats)
@@ -770,7 +790,7 @@ namespace CodeCrakers.Views
             txtRecentActivity.Text = activityText.ToString();
         }
 
-        public void RefreshData()
+    public void RefreshData()
         {
             // Only reload initial data if we're currently visible
             // This prevents unnecessary UI updates when dashboard is not visible
@@ -778,21 +798,20 @@ namespace CodeCrakers.Views
             {
                 LoadInitialData();
             }
-            LoadDashboardDataAsync();
+            _ = LoadDashboardDataAsync();
         }
 
-        private T FindChild<T>(System.Windows.DependencyObject parent, string childName) where T : System.Windows.DependencyObject
+        private T? FindChild<T>(System.Windows.DependencyObject parent, string childName) where T : System.Windows.DependencyObject
         {
             if (parent == null) return null;
 
-            T foundChild = null;
+            T? foundChild = null;
             int childrenCount = System.Windows.Media.VisualTreeHelper.GetChildrenCount(parent);
 
             for (int i = 0; i < childrenCount; i++)
             {
                 var child = System.Windows.Media.VisualTreeHelper.GetChild(parent, i);
-                T childType = child as T;
-                if (childType == null)
+                if (child is not T childType)
                 {
                     foundChild = FindChild<T>(child, childName);
                     if (foundChild != null) break;

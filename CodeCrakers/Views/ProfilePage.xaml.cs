@@ -9,10 +9,10 @@ namespace CodeCrakers.Views
     public partial class ProfilePage : UserControl
     {
         private int _userId;
-        private UserRepository _userRepo;
-        private UserProfileRepository _profileRepo;
-        private User _currentUser;
-        private UserProfile _currentProfile;
+    private UserRepository _userRepo = null!;
+    private UserProfileRepository _profileRepo = null!;
+    private User _currentUser = null!;
+    private UserProfile _currentProfile = null!;
 
         public ProfilePage(int userId)
         {
@@ -28,12 +28,13 @@ namespace CodeCrakers.Views
             try
             {
                 // Load user information
-                _currentUser = _userRepo.GetById(_userId);
-                if (_currentUser == null)
+                var user = _userRepo.GetById(_userId);
+                if (user == null)
                 {
                     MessageBox.Show("User not found!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
+                _currentUser = user;
 
                 // Load user profile information
                 _currentProfile = _profileRepo.GetByUserId(_userId);
@@ -291,6 +292,6 @@ namespace CodeCrakers.Views
         }
 
         // Event to notify parent when profile is updated
-        public System.Action OnProfileUpdated { get; set; }
+    public System.Action? OnProfileUpdated { get; set; }
     }
 }

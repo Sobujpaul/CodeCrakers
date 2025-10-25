@@ -16,6 +16,9 @@ namespace CodeCrakers.Data
         private static readonly string ConnectionString =
             $"Data Source={DbFilePath};Cache=Shared;Foreign Keys=True;Mode=ReadWriteCreate";
 
+        // Expose database path for diagnostics/logging
+        public static string GetDatabasePath() => DbFilePath;
+
         // Called from App.xaml.cs at startup
         public static void Initialize()
         {
@@ -139,6 +142,41 @@ CREATE TABLE IF NOT EXISTS Notifications(
             EnsureColumn(con, "Notifications", "ScheduledFor", "TEXT", null);
             EnsureColumn(con, "Notifications", "ActionUrl", "TEXT", null);
             EnsureColumn(con, "Notifications", "IconClass", "TEXT", null);
+        }
+
+        // Optional: lightweight database health check (integrity + foreign keys)
+        public static void HealthCheck()
+        {
+            try
+            {
+                using var con = GetConnection();
+                con.Open();
+
+                using (var pragmaFk = con.CreateCommand())
+                {
+                    pragmaFk.CommandText = "PRAGMA foreign_keys";
+                    var fk = pragmaFk.ExecuteScalar()?.ToString();
+                    Utils.Logger.Log($"[DB] foreign_keys pragma: {fk}");
+                }
+
+                using (var integrity = con.CreateCommand())
+                {
+                    integrity.CommandText = "PRAGMA integrity_check";
+                    var result = integrity.ExecuteScalar()?.ToString();
+                    if (string.Equals(result, "ok", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Utils.Logger.Log("[DB] integrity_check: ok");
+                    }
+                    else
+                    {
+                        Utils.Logger.Log($"[DB] integrity_check: {result}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.Logger.Log($"[DB] HealthCheck exception: {ex}");
+            }
         }
 
         public static SqliteConnection GetConnection()

@@ -20,14 +20,16 @@ namespace CodeCrakers.Services
             _contestRepo = new ContestRepository();
         }
 
-        public async Task<List<Notification>> GetActiveNotificationsAsync(int? userId = null)
+        public Task<List<Notification>> GetActiveNotificationsAsync(int? userId = null)
         {
-            return _notificationRepo.GetActiveNotifications(userId);
+            // No I/O here; return synchronously without changing behavior
+            return Task.FromResult(_notificationRepo.GetActiveNotifications(userId));
         }
 
-        public async Task<List<Notification>> GetAllNotificationsAsync(int? userId = null, int page = 1, int pageSize = 20)
+        public Task<List<Notification>> GetAllNotificationsAsync(int? userId = null, int page = 1, int pageSize = 20)
         {
-            return _notificationRepo.GetNotifications(userId, page, pageSize);
+            // No I/O here; return synchronously without changing behavior
+            return Task.FromResult(_notificationRepo.GetNotifications(userId, page, pageSize));
         }
 
         public async Task RefreshContestsAndGenerateNotificationsAsync()
@@ -49,7 +51,7 @@ namespace CodeCrakers.Services
             }
         }
 
-        private async Task UpdateContestsInDatabaseAsync(List<Contest> contests)
+        private Task UpdateContestsInDatabaseAsync(List<Contest> contests)
         {
             foreach (var contest in contests)
             {
@@ -72,6 +74,7 @@ namespace CodeCrakers.Services
                     _contestRepo.Update(existingContest);
                 }
             }
+            return Task.CompletedTask;
         }
 
         private async Task GenerateContestNotificationsAsync()
@@ -176,7 +179,7 @@ namespace CodeCrakers.Services
             }
         }
 
-        private async Task CreateNotificationIfNotExists(int contestId, NotificationType type, string title, 
+        private Task CreateNotificationIfNotExists(int contestId, NotificationType type, string title, 
             string message, NotificationPriority priority, string? actionUrl = null, string? iconClass = null)
         {
             // Check if similar notification already exists
@@ -196,6 +199,7 @@ namespace CodeCrakers.Services
 
                 _notificationRepo.Add(notification);
             }
+            return Task.CompletedTask;
         }
 
         public void MarkAsRead(int notificationId)
@@ -254,7 +258,7 @@ namespace CodeCrakers.Services
             };
         }
 
-        public async Task CreateWelcomeNotification(int userId, string username)
+        public Task CreateWelcomeNotification(int userId, string username)
         {
             var notification = new Notification
             {
@@ -268,9 +272,10 @@ namespace CodeCrakers.Services
             };
 
             _notificationRepo.Add(notification);
+            return Task.CompletedTask;
         }
 
-        public async Task CreateCustomNotification(int? userId, string title, string message, 
+        public Task CreateCustomNotification(int? userId, string title, string message, 
             NotificationType type = NotificationType.General, NotificationPriority priority = NotificationPriority.Normal)
         {
             var notification = new Notification
@@ -285,6 +290,7 @@ namespace CodeCrakers.Services
             };
 
             _notificationRepo.Add(notification);
+            return Task.CompletedTask;
         }
     }
 }

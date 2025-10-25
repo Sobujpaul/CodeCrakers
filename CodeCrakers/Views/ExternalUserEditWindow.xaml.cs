@@ -39,7 +39,7 @@ namespace CodeCrakers.Views
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            ExternalUser.DisplayName = txtDisplayName.Text?.Trim();
+            ExternalUser.DisplayName = (txtDisplayName.Text ?? string.Empty).Trim();
             ExternalUser.Codeforces = string.IsNullOrWhiteSpace(txtCodeforces.Text) ? null : txtCodeforces.Text.Trim();
             ExternalUser.LeetCode = string.IsNullOrWhiteSpace(txtLeetCode.Text) ? null : txtLeetCode.Text.Trim();
             ExternalUser.Codechef = string.IsNullOrWhiteSpace(txtCodeChef.Text) ? null : txtCodeChef.Text.Trim();

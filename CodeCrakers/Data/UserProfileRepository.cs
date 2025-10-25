@@ -38,7 +38,7 @@ namespace CodeCrakers.Data
         }
 
         // ✅ Insert or update platform usernames
-        public void Upsert(int userId, string codeforces, string leetcode, string codechef, string atcoder)
+    public void Upsert(int userId, string? codeforces, string? leetcode, string? codechef, string? atcoder)
         {
             using var con = AppDb.GetConnection();
             con.Open();
@@ -63,8 +63,8 @@ ON CONFLICT(UserId) DO UPDATE SET
         }
 
         // ✅ Insert or update profile with all fields
-        public void Upsert(int userId, string codeforces, string leetcode, string codechef, string atcoder, 
-                          string country, string university, int isHidden)
+    public void Upsert(int userId, string? codeforces, string? leetcode, string? codechef, string? atcoder, 
+              string? country, string? university, int isHidden)
         {
             using var con = AppDb.GetConnection();
             con.Open();

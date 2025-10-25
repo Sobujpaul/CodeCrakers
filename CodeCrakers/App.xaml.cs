@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using CodeCrakers.Data;
+using CodeCrakers.Utils;
 
 namespace CodeCrakers
 {
@@ -11,6 +12,10 @@ namespace CodeCrakers
 
             // Initialize SQLite database
             AppDb.Initialize();
+
+            // Optional: log DB path and perform a quick health check
+            Logger.Log($"[App] DB Path: {AppDb.GetDatabasePath()}");
+            AppDb.HealthCheck();
 
         }
     }

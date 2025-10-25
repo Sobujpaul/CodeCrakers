@@ -26,7 +26,7 @@ namespace CodeCrakers.Services
                 response.EnsureSuccessStatusCode();
                 
                 var json = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<T>(json);
+                return JsonConvert.DeserializeObject<T>(json)!;
             }
             catch (HttpRequestException ex)
             {

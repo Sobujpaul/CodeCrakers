@@ -17,11 +17,11 @@ namespace CodeCrakers.Views
 {
     public partial class NotificationPage : UserControl
     {
-        private List<ContestNotification> notifications = new List<ContestNotification>();
-        private List<ClistContest> upcomingContests = new List<ClistContest>();
+    private List<ClistContest> upcomingContests = new List<ClistContest>();
         private HttpClient httpClient;
         private ClistScraperService clistScraper;
-        private DispatcherTimer autoRefreshTimer;
+    private KontestsApiService kontestsApi;
+    private DispatcherTimer? autoRefreshTimer;
         private bool isRefreshing;
 
         public NotificationPage()
@@ -29,6 +29,7 @@ namespace CodeCrakers.Views
             InitializeComponent();
             httpClient = new HttpClient();
             clistScraper = new ClistScraperService();
+            kontestsApi = new KontestsApiService();
             this.Loaded += NotificationPage_Loaded;
             this.Unloaded += NotificationPage_Unloaded;
             LoadData();
@@ -90,8 +91,6 @@ namespace CodeCrakers.Views
             try
             {
                 await LoadUpcomingContests();
-                LoadNotifications();
-                UpdateNotificationCount();
             }
             catch (Exception ex)
             {
@@ -107,11 +106,50 @@ namespace CodeCrakers.Views
                 contestsPanel.Children.Clear();
                 contestsPanel.Children.Add(txtNoContests);
 
-                // Fetch upcoming contests from clist.by
-                var clistContests = await clistScraper.GetUpcomingContestsAsync();
-
+                // Preferred source: kontests.net aggregator API (broad coverage across platforms)
                 upcomingContests.Clear();
-                upcomingContests.AddRange(clistContests);
+                try
+                {
+                    var all = await kontestsApi.GetAllUpcomingAsync();
+                    if (all != null && all.Count > 0)
+                    {
+                        upcomingContests.AddRange(all);
+                    }
+                }
+                catch { /* ignore and try next source */ }
+
+                // Secondary source: clist.by scraping
+                if (upcomingContests.Count == 0)
+                {
+                    try
+                    {
+                        var clistContests = await clistScraper.GetUpcomingContestsAsync();
+                        upcomingContests.AddRange(clistContests);
+                    }
+                    catch { }
+                }
+
+                // Final fallback: internal contest sources (CF API + generators)
+                if (upcomingContests.Count == 0)
+                {
+                    try
+                    {
+                        var api = new ContestApiService();
+                        var alt = await api.GetUpcomingContestsAsync();
+                        foreach (var c in alt)
+                        {
+                            upcomingContests.Add(new ClistContest
+                            {
+                                Name = c.Name,
+                                Platform = c.Platform.ToLowerInvariant(),
+                                StartTimeUtc = c.StartTime.ToUniversalTime(),
+                                Duration = TimeSpan.FromSeconds(Math.Max(0, c.DurationSeconds)),
+                                Url = string.IsNullOrWhiteSpace(c.Url) ? "https://clist.by/?view=list" : c.Url
+                            });
+                        }
+                    }
+                    catch { }
+                }
 
                 DisplayUpcomingContests();
             }
@@ -227,208 +265,7 @@ namespace CodeCrakers.Views
             return border;
         }
 
-        private void LoadNotifications()
-        {
-            // For now, create sample notifications
-            // In a real application, this would load from a database or API
-            notifications.Clear();
-            
-            // Add notifications for upcoming contests
-            foreach (var contest in upcomingContests.Take(3))
-            {
-                var startTime = new DateTimeOffset(contest.StartTimeUtc, TimeSpan.Zero);
-                var timeUntilStart = startTime - DateTimeOffset.Now;
-                
-                if (timeUntilStart.TotalHours <= 24 && timeUntilStart.TotalHours > 0)
-                {
-                    notifications.Add(new ContestNotification
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Title = "Contest Starting Soon",
-                        Message = $"{contest.Name} starts in {(timeUntilStart.TotalHours < 1 ? $"{(int)timeUntilStart.TotalMinutes} minutes" : $"{(int)timeUntilStart.TotalHours} hours")}",
-                        Timestamp = DateTimeOffset.Now,
-                        IsRead = false,
-                        Type = NotificationType.ContestReminder,
-                        ContestId = null
-                    });
-                }
-            }
-
-            // Add some general notifications
-            if (notifications.Count == 0)
-            {
-                notifications.Add(new ContestNotification
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Title = "Welcome to CodeCrakers",
-                    Message = "Stay updated with upcoming coding contests and track your progress!",
-                    Timestamp = DateTimeOffset.Now.AddHours(-1),
-                    IsRead = false,
-                    Type = NotificationType.General
-                });
-            }
-
-            DisplayNotifications();
-        }
-
-        private void DisplayNotifications()
-        {
-            notificationsPanel.Children.Clear();
-
-            if (notifications.Count == 0)
-            {
-                txtNoNotifications.Text = "No notifications yet.";
-                notificationsPanel.Children.Add(txtNoNotifications);
-                return;
-            }
-
-            foreach (var notification in notifications.OrderByDescending(n => n.Timestamp))
-            {
-                var notificationItem = CreateNotificationItem(notification);
-                notificationsPanel.Children.Add(notificationItem);
-            }
-        }
-
-        private Border CreateNotificationItem(ContestNotification notification)
-        {
-            var border = new Border
-            {
-                Style = (Style)Resources["NotificationItemStyle"],
-                Opacity = notification.IsRead ? 0.7 : 1.0
-            };
-
-            var mainGrid = new Grid();
-            mainGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            mainGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            mainGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-            // Icon
-            var icon = new IconImage
-            {
-                Icon = notification.Type == NotificationType.ContestReminder ? IconChar.Calendar : IconChar.Info,
-                Width = 20,
-                Height = 20,
-                Foreground = notification.IsRead ? (Brush)FindResource("plainTextColor1") : (Brush)FindResource("color1"),
-                VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(0, 5, 15, 0)
-            };
-
-            // Content
-            var contentStack = new StackPanel();
-            
-            var titleText = new TextBlock
-            {
-                Text = notification.Title,
-                FontFamily = new FontFamily("Montserrat"),
-                FontSize = 14,
-                FontWeight = notification.IsRead ? FontWeights.Normal : FontWeights.Medium,
-                Foreground = (Brush)FindResource("titleColor1"),
-                TextWrapping = TextWrapping.Wrap,
-                Margin = new Thickness(0, 0, 0, 5)
-            };
-
-            var messageText = new TextBlock
-            {
-                Text = notification.Message,
-                FontFamily = new FontFamily("Montserrat"),
-                FontSize = 12,
-                Foreground = (Brush)FindResource("plainTextColor1"),
-                TextWrapping = TextWrapping.Wrap,
-                Margin = new Thickness(0, 0, 0, 5)
-            };
-
-            var timeText = new TextBlock
-            {
-                Text = FormatRelativeTime(notification.Timestamp),
-                FontFamily = new FontFamily("Montserrat"),
-                FontSize = 11,
-                Foreground = (Brush)FindResource("plainTextColor1"),
-                Opacity = 0.8
-            };
-
-            contentStack.Children.Add(titleText);
-            contentStack.Children.Add(messageText);
-            contentStack.Children.Add(timeText);
-
-            // Unread indicator
-            var unreadIndicator = new Border
-            {
-                Width = 8,
-                Height = 8,
-                CornerRadius = new CornerRadius(4),
-                Background = (Brush)FindResource("color2"),
-                VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(0, 8, 0, 0),
-                Visibility = notification.IsRead ? Visibility.Collapsed : Visibility.Visible
-            };
-
-            Grid.SetColumn(icon, 0);
-            Grid.SetColumn(contentStack, 1);
-            Grid.SetColumn(unreadIndicator, 2);
-
-            mainGrid.Children.Add(icon);
-            mainGrid.Children.Add(contentStack);
-            mainGrid.Children.Add(unreadIndicator);
-
-            border.Child = mainGrid;
-
-            // Add click event to mark as read
-            border.MouseLeftButtonUp += (s, e) => 
-            {
-                if (!notification.IsRead)
-                {
-                    notification.IsRead = true;
-                    DisplayNotifications();
-                    UpdateNotificationCount();
-                }
-
-                // If it's a contest notification, open the contest
-                if (notification.Type == NotificationType.ContestReminder)
-                {
-                    try
-                    {
-                        var url = "https://clist.by/?view=list";
-                        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-                    }
-                    catch (Exception ex)
-                    {
-                        ShowError($"Error opening contest URL: {ex.Message}");
-                    }
-                }
-            };
-
-            return border;
-        }
-
-        private string FormatRelativeTime(DateTimeOffset timestamp)
-        {
-            var diff = DateTimeOffset.Now - timestamp;
-            
-            if (diff.TotalMinutes < 1)
-                return "Just now";
-            else if (diff.TotalMinutes < 60)
-                return $"{(int)diff.TotalMinutes} minutes ago";
-            else if (diff.TotalHours < 24)
-                return $"{(int)diff.TotalHours} hours ago";
-            else if (diff.TotalDays < 7)
-                return $"{(int)diff.TotalDays} days ago";
-            else
-                return timestamp.ToString("MMM dd, yyyy");
-        }
-
-        private void UpdateNotificationCount()
-        {
-            var unreadCount = notifications.Count(n => !n.IsRead);
-            
-            if (unreadCount == 0)
-            {
-                txtNotificationCount.Text = "No unread notifications";
-            }
-            else
-            {
-                txtNotificationCount.Text = $"{unreadCount} unread notification{(unreadCount > 1 ? "s" : "")}";
-            }
-        }
+        // Removed notifications list: page focuses on upcoming contests only
 
         private void ShowError(string message)
         {
@@ -440,16 +277,6 @@ namespace CodeCrakers.Views
             await SafeRefreshAsync();
         }
 
-        private void btnMarkAllRead_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (var notification in notifications)
-            {
-                notification.IsRead = true;
-            }
-            DisplayNotifications();
-            UpdateNotificationCount();
-        }
-
         private async Task SafeRefreshAsync()
         {
             if (isRefreshing) return;
@@ -457,8 +284,6 @@ namespace CodeCrakers.Views
             {
                 isRefreshing = true;
                 await LoadUpcomingContests();
-                LoadNotifications();
-                UpdateNotificationCount();
             }
             finally
             {
@@ -466,60 +291,5 @@ namespace CodeCrakers.Views
             }
         }
     }
-
-    // Data models
-    public class ContestNotification
-    {
-        public string Id { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-        public string Message { get; set; } = string.Empty;
-        public DateTimeOffset Timestamp { get; set; }
-        public bool IsRead { get; set; }
-        public NotificationType Type { get; set; }
-        public int? ContestId { get; set; }
-    }
-
-    public enum NotificationType
-    {
-        General,
-        ContestReminder,
-        Achievement,
-        System
-    }
-
-    public class Contest
-    {
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-    [JsonProperty("name")]
-    public string Name { get; set; } = string.Empty;
-
-    [JsonProperty("type")]
-    public string Type { get; set; } = string.Empty;
-
-    [JsonProperty("phase")]
-    public string Phase { get; set; } = string.Empty;
-
-        [JsonProperty("frozen")]
-        public bool Frozen { get; set; }
-
-        [JsonProperty("durationSeconds")]
-        public int DurationSeconds { get; set; }
-
-        [JsonProperty("startTimeSeconds")]
-        public long StartTimeSeconds { get; set; }
-
-        [JsonProperty("relativeTimeSeconds")]
-        public long RelativeTimeSeconds { get; set; }
-    }
-
-    public class CodeforcesApiResponse<T>
-    {
-        [JsonProperty("status")]
-        public string Status { get; set; } = string.Empty;
-
-        [JsonProperty("result")]
-        public T Result { get; set; } = default!;
-    }
+    // Removed notifications + local API models; using aggregator services for contests
 }

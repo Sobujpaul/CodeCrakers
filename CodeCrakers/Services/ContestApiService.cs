@@ -78,7 +78,7 @@ namespace CodeCrakers.Services
             return contests;
         }
 
-        private async Task<List<Contest>> GetAtCoderContestsAsync()
+        private Task<List<Contest>> GetAtCoderContestsAsync()
         {
             var contests = new List<Contest>();
 
@@ -121,10 +121,10 @@ namespace CodeCrakers.Services
                 Console.WriteLine($"Error fetching AtCoder contests: {ex.Message}");
             }
 
-            return contests;
+            return Task.FromResult(contests);
         }
 
-        private async Task<List<Contest>> GetCodeChefContestsAsync()
+        private Task<List<Contest>> GetCodeChefContestsAsync()
         {
             var contests = new List<Contest>();
 
@@ -173,7 +173,7 @@ namespace CodeCrakers.Services
                 Console.WriteLine($"Error generating CodeChef contests: {ex.Message}");
             }
 
-            return contests;
+            return Task.FromResult(contests);
         }
 
         private ContestType DetermineCodeforcesContestType(string contestName)
@@ -252,18 +252,18 @@ namespace CodeCrakers.Services
             return null;
         }
 
-        private async Task<Contest?> GetAtCoderContestDetailsAsync(int contestId)
+        private Task<Contest?> GetAtCoderContestDetailsAsync(int contestId)
         {
             // Placeholder for AtCoder contest details
             // In real implementation, scrape or use unofficial API
-            return null;
+            return Task.FromResult<Contest?>(null);
         }
 
-        private async Task<Contest?> GetCodeChefContestDetailsAsync(int contestId)
+        private Task<Contest?> GetCodeChefContestDetailsAsync(int contestId)
         {
             // Placeholder for CodeChef contest details
             // In real implementation, scrape or use unofficial API
-            return null;
+            return Task.FromResult<Contest?>(null);
         }
     }
 

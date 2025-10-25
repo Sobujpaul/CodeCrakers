@@ -587,7 +587,7 @@ namespace CodeCrakers.Views
             return "A"; // Default fallback
         }
 
-        private async void btnRefresh_Click(object sender, RoutedEventArgs e)
+        private void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
             LoadAnalyticsAsync();
         }

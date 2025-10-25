@@ -69,7 +69,7 @@ namespace CodeCrakers.Data
         }
 
         // ✅ Get full user info by Id
-        public User GetById(int id)
+        public User? GetById(int id)
         {
             using var con = AppDb.GetConnection();
             con.Open();

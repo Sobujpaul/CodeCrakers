@@ -132,6 +132,7 @@ namespace CodeCrakers.Models
     {
         public string UserName { get; set; } = string.Empty;
         public string RealName { get; set; } = string.Empty;
+        public string Ranking { get; set; } = string.Empty;
         public string AboutMe { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
         public string WebsiteUrl { get; set; } = string.Empty;

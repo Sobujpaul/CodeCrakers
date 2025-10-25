@@ -37,7 +37,7 @@ namespace CodeCrakers.Views
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string str = value as string;
+            string? str = value as string;
             return !string.IsNullOrWhiteSpace(str) ? Visibility.Visible : Visibility.Collapsed;
         }
 
@@ -51,7 +51,7 @@ namespace CodeCrakers.Views
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string str = value as string;
+            string? str = value as string;
             return string.IsNullOrWhiteSpace(str) ? Visibility.Visible : Visibility.Collapsed;
         }
 

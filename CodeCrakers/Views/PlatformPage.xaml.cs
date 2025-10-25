@@ -222,6 +222,6 @@ namespace CodeCrakers.Views
         }
 
         // Event to notify parent when settings are saved
-        public System.Action OnSettingsSaved { get; set; }
+    public System.Action? OnSettingsSaved { get; set; }
     }
 }

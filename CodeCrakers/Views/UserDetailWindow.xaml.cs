@@ -6,7 +6,7 @@ namespace CodeCrakers.Views
 {
     public partial class UserDetailWindow : Window
     {
-        public UserDetailWindow(AggregatedUserStats user, string focusPlatform = null)
+        public UserDetailWindow(AggregatedUserStats user, string? focusPlatform = null)
         {
             InitializeComponent();
 

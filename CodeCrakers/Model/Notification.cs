@@ -7,8 +7,8 @@ namespace CodeCrakers.Models
         public int Id { get; set; }                      // Primary Key
         public int? UserId { get; set; }                 // User ID (nullable for system-wide notifications)
         public int? ContestId { get; set; }              // Associated contest ID
-        public string Title { get; set; }               // Notification title
-        public string Message { get; set; }             // Notification message
+        public string Title { get; set; } = string.Empty;               // Notification title
+        public string Message { get; set; } = string.Empty;             // Notification message
         public NotificationType Type { get; set; }      // Type of notification
         public NotificationPriority Priority { get; set; } = NotificationPriority.Normal;
         public DateTime CreatedAt { get; set; }         // When notification was created

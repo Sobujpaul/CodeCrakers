@@ -12,7 +12,9 @@ namespace CodeCrakers.Views
     {
         private LeaderboardService _leaderboardService = new LeaderboardService();
         private int currentPage = 1;
-        private int pageSize = 10;
+    private int pageSize = 10;
+    private int totalPages = 1;
+    private int totalCount = 0;
         private string currentUsername = "Anonymous"; // You can set this from the logged-in user
 
         public LeaderboardPage()
@@ -23,7 +25,7 @@ namespace CodeCrakers.Views
 
         public async void LoadLeaderboard()
         {
-            var sortBy = ((ComboBoxItem)cmbSort.SelectedItem)?.Tag?.ToString() ?? "currentRating";
+            var sortBy = (cmbSort?.SelectedValue as string) ?? "currentRating";
 
             // Handle placeholder text
             var searchText = (txtSearch.Text == "Search Name") ? "" : txtSearch.Text;
@@ -35,18 +37,52 @@ namespace CodeCrakers.Views
                 // Show loading indication
                 txtPageInfo.Text = "Loading live data...";
                 
-                // Use live API data for accurate stats
+                // Use live API data for accurate stats (CF-only & external-only)
                 var leaderboard = await _leaderboardService.GetLeaderboardWithLiveDataAsync(
                     currentPage,
                     pageSize,
                     searchText,
                     countryText,
                     universityText,
-                    sortBy
+                    sortBy,
+                    includeRegisteredUsers: false,
+                    onlyExternalAddedBy: currentUsername
                 );
 
+                // Compute total count and pages for current filters
+                totalCount = _leaderboardService.GetTotalCount(
+                    searchText,
+                    countryText,
+                    universityText,
+                    includeRegisteredUsers: false,
+                    onlyExternalAddedBy: currentUsername
+                );
+                totalPages = Math.Max(1, (int)Math.Ceiling(totalCount / (double)pageSize));
+
+                // If current page exceeds total pages (e.g., after deletions), snap back and reload
+                if (currentPage > totalPages)
+                {
+                    currentPage = totalPages;
+                    leaderboard = await _leaderboardService.GetLeaderboardWithLiveDataAsync(
+                        currentPage,
+                        pageSize,
+                        searchText,
+                        countryText,
+                        universityText,
+                        sortBy,
+                        includeRegisteredUsers: false,
+                        onlyExternalAddedBy: currentUsername
+                    );
+                }
+
                 dgLeaderboard.ItemsSource = leaderboard;
-                txtPageInfo.Text = $"Page {currentPage}";
+                txtPageInfo.Text = totalCount > 0
+                    ? $"Page {currentPage} of {totalPages} ({totalCount} users)"
+                    : "No users found";
+
+                // Enable/disable pagination buttons based on available pages
+                if (btnPrevious != null) btnPrevious.IsEnabled = currentPage > 1;
+                if (btnNext != null) btnNext.IsEnabled = currentPage < totalPages;
             }
             catch (Exception ex)
             {
@@ -55,9 +91,35 @@ namespace CodeCrakers.Views
             }
         }
 
-        private void btnNext_Click(object sender, RoutedEventArgs e) { currentPage++; LoadLeaderboard(); }
-        private void btnPrevious_Click(object sender, RoutedEventArgs e) { if (currentPage > 1) currentPage--; LoadLeaderboard(); }
-        private void btnApplyFilters_Click(object sender, RoutedEventArgs e) { currentPage = 1; LoadLeaderboard(); }
+        private void btnNext_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentPage < totalPages)
+            {
+                currentPage++;
+                LoadLeaderboard();
+            }
+        }
+
+        private void btnPrevious_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentPage > 1)
+            {
+                currentPage--;
+                LoadLeaderboard();
+            }
+        }
+        private async void btnApplyFilters_Click(object sender, RoutedEventArgs e)
+        {
+            // Ensure ComboBox selection is committed before reading it in LoadLeaderboard
+            if (cmbSort != null && cmbSort.IsDropDownOpen)
+            {
+                cmbSort.IsDropDownOpen = false;
+                await Task.Yield(); // allow UI to process SelectionChanged
+            }
+
+            currentPage = 1;
+            LoadLeaderboard();
+        }
         private void btnRefreshAll_Click(object sender, RoutedEventArgs e)
         {
             // Reset placeholders
@@ -67,12 +129,15 @@ namespace CodeCrakers.Views
 
             // Reset sorting and paging
             currentPage = 1;
-            foreach (var item in cmbSort.Items)
+            if (cmbSort != null)
             {
-                if (item is ComboBoxItem cbi && (string)cbi.Tag == "currentRating")
+                foreach (var item in cmbSort.Items)
                 {
-                    cbi.IsSelected = true;
-                    break;
+                    if (item is ComboBoxItem cbi && (cbi.Tag as string) == "currentRating")
+                    {
+                        cbi.IsSelected = true;
+                        break;
+                    }
                 }
             }
 
@@ -80,15 +145,16 @@ namespace CodeCrakers.Views
             LoadLeaderboard();
         }
 
-        private void PlatformButton_Click(object sender, RoutedEventArgs e)
+        private async void PlatformButton_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
+            if (button == null) return;
             var platform = button.Tag?.ToString();
             var leaderboardEntry = button.DataContext as LeaderboardEntry;
 
             if (leaderboardEntry == null || platform == null) return;
 
-            string username = platform.ToLower() switch
+            string? username = platform.ToLower() switch
             {
                 "codeforces" => leaderboardEntry.CodeforcesUsername,
                 "leetcode" => leaderboardEntry.LeetCodeUsername,
@@ -99,26 +165,32 @@ namespace CodeCrakers.Views
 
             if (!string.IsNullOrEmpty(username))
             {
-                if (platform.Equals("codeforces", StringComparison.OrdinalIgnoreCase))
+                try
                 {
-                    try
+                    if (platform.Equals("codeforces", StringComparison.OrdinalIgnoreCase))
                     {
+                        // Keep existing detailed analytics window for CF
                         var analytics = new CfAnalyticsWindow(username, new PlatformApiManager())
                         {
                             Owner = Window.GetWindow(this)
                         };
                         analytics.ShowDialog();
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        MessageBox.Show($"Unable to open CF Analytics: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        // Show brief popup for LC/CC/AC with live stats
+                        var api = new PlatformApiManager();
+                        var stats = await api.GetPlatformStatsAsync(platform, username);
+                        var dlg = new PlatformDetailWindow(stats, leaderboardEntry.Name)
+                        {
+                            Owner = Window.GetWindow(this)
+                        };
+                        dlg.ShowDialog();
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    var userType = leaderboardEntry.IsExternal ? "External User" : "Registered User";
-                    MessageBox.Show($"Platform: {platform}\nUsername: {username}\nUser: {leaderboardEntry.Name}\nType: {userType}",
-                        "Platform Details", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show($"Unable to open {platform} stats: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -151,8 +223,9 @@ namespace CodeCrakers.Views
                 ShowStatus("Adding user and fetching stats...", true);
 
                 // Add external user
+                var addedName = txtDisplayName.Text.Trim();
                 await _leaderboardService.AddExternalUserAsync(
-                    txtDisplayName.Text.Trim(),
+                    addedName,
                     codeforces,
                     leetcode,
                     codechef,
@@ -168,7 +241,7 @@ namespace CodeCrakers.Views
                 // Refresh leaderboard
                 LoadLeaderboard();
                 
-                ShowStatus($"Successfully added {txtDisplayName.Text} to leaderboard!", true);
+                ShowStatus($"Successfully added {addedName} to leaderboard!", true);
                 
                 // Hide status after 3 seconds
                 await Task.Delay(3000);
@@ -193,7 +266,7 @@ namespace CodeCrakers.Views
             {
                 try
                 {
-                    button.IsEnabled = false;
+                    if (button != null) button.IsEnabled = false;
                     await _leaderboardService.RefreshExternalUserStatsAsync(leaderboardEntry.Id);
                     LoadLeaderboard();
                     MessageBox.Show($"Stats refreshed for {leaderboardEntry.Name}", "Success", 
@@ -206,7 +279,7 @@ namespace CodeCrakers.Views
                 }
                 finally
                 {
-                    button.IsEnabled = true;
+                    if (button != null) button.IsEnabled = true;
                 }
             }
         }

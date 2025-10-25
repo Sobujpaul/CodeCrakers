@@ -94,23 +94,7 @@ namespace CodeCrakers.Views
                 // Difficulty distribution string
                 txtDifficulty.Text = BuildDifficultyDistribution(a1, a2);
 
-                // Attempt efficiency metrics
-                var m1Task = _cfService.GetAttemptMetricsAsync(_handle1);
-                var m2Task = _cfService.GetAttemptMetricsAsync(_handle2);
-                await Task.WhenAll(m1Task, m2Task);
-                var m1 = m1Task.Result; var m2 = m2Task.Result;
-                if (valAvgAttempts1 != null)
-                {
-                    valAvgAttempts1.Text = m1.AverageAttempts.ToString("F2");
-                    valAvgAttempts2.Text = m2.AverageAttempts.ToString("F2");
-                    valMaxAttempts1.Text = m1.MaxAttempts.ToString();
-                    valMaxAttempts2.Text = m2.MaxAttempts.ToString();
-                    valOneShot1.Text = m1.OneShotPercentage.ToString("F1");
-                    valOneShot2.Text = m2.OneShotPercentage.ToString("F1");
-                    SetDiff(diffAvgAttempts, m1.AverageAttempts, m2.AverageAttempts, "F2", higherIsBetter:false);
-                    SetDiff(diffMaxAttempts, m1.MaxAttempts, m2.MaxAttempts, higherIsBetter:false);
-                    SetDiff(diffOneShot, m1.OneShotPercentage, m2.OneShotPercentage, "F1", higherIsBetter:true);
-                }
+                // Removed Problem Solving Efficiency section and related metrics fetch to simplify the layout
 
                 txtStatus.Text = "";
             }
